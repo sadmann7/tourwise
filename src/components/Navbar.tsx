@@ -1,10 +1,12 @@
 import Link from "next/link";
-import Router from "next/router";
+import { useRouter } from "next/router";
 
 // external imports
 import { FaRegPaperPlane } from "react-icons/fa";
 
 const Navbar = () => {
+  const router = useRouter();
+
   return (
     <header
       aria-label="header"
@@ -25,11 +27,7 @@ const Navbar = () => {
             href="https://github.com/sadmann7/next-tour"
             target="_blank"
             rel="noreferrer"
-            className={`rounded-md px-3 py-1 font-mono text-base text-white transition-colors hover:bg-neutral-700 active:bg-neutral-800 ${
-              window.location.href.includes("github")
-                ? "bg-neutral-700"
-                : "bg-transparent"
-            }`}
+            className="rounded-md bg-transparent px-3 py-1 font-mono text-base text-white transition-colors hover:bg-neutral-700 active:bg-neutral-800"
           >
             Repository
           </a>
@@ -37,7 +35,7 @@ const Navbar = () => {
             aria-label="navigate to favourited places page"
             href={"/favourited"}
             className={`rounded-md px-3 py-1 font-mono text-base text-white transition-colors hover:bg-neutral-700 active:bg-neutral-800 ${
-              Router.pathname === "/favourited"
+              router.pathname === "/favourited"
                 ? "bg-neutral-700"
                 : "bg-transparent"
             }`}
