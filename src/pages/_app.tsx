@@ -1,14 +1,14 @@
+import "@/styles/globals.css";
 import type { NextPage } from "next";
 import type { AppProps } from "next/app";
 import { type AppType } from "next/app";
 import Head from "next/head";
 import { type ReactElement, type ReactNode } from "react";
-import "../styles/globals.css";
-import { api } from "../utils/api";
 
 // external imports
 import ToastWrapper from "@/components/ToastWrapper";
 import Layout from "@/layouts/Layout";
+import { api } from "@/utils/api";
 
 export type NextPageWithLayout<P = Record<string, unknown>, IP = P> = NextPage<
   P,

@@ -4,8 +4,8 @@ import { FaGithub } from "react-icons/fa";
 const Footer = () => {
   return (
     <footer aria-label="footer" className="bg-neutral-900">
-      <div className="container mx-auto flex max-w-6xl items-center justify-between gap-4 border-t-2 border-t-gray-500 px-4 py-5">
-        <h1 className="text-lg text-white">
+      <div className="container mx-auto flex max-w-5xl items-center justify-between gap-4 border-t-2 border-t-gray-500 px-4 py-5">
+        <h1 className="text-base text-white">
           Made with{" "}
           <a
             aria-label="navigate to openai overview page"
