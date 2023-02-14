@@ -1,12 +1,26 @@
 import Head from "next/head";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import type { NextPageWithLayout } from "./_app";
 
 // external imports
+import SearchableSelect from "@/components/SearchableSelect";
+import rawCountries from "@/data/countries.json";
 import Layout from "@/layouts/Layout";
-import { api } from "@/utils/api";
+
+type Inputs = {
+  country: string;
+  budget: string;
+  duration: number;
+};
 
 const Home: NextPageWithLayout = () => {
-  const hello = api.example.hello.useQuery({ text: "from tRPC" });
+  const countries = rawCountries.map((country) => country.name);
+
+  // react-hook-form
+  const { register, handleSubmit, control } = useForm<Inputs>();
+  const onSubmit: SubmitHandler<Inputs> = (data) => {
+    console.log(data);
+  };
 
   return (
     <>
@@ -16,9 +30,56 @@ const Home: NextPageWithLayout = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="container mx-auto mt-24 mb-14 min-h-screen max-w-5xl px-4">
-        <p className="text-base text-white">
-          {hello.data ? hello.data.greeting : "Loading tRPC query..."}
-        </p>
+        <form
+          aria-label="generate city from"
+          className="grid w-full gap-5"
+          onSubmit={(...args) => void handleSubmit(onSubmit)(...args)}
+        >
+          <fieldset className="grid gap-3">
+            <label htmlFor="country" className="text-base text-white">
+              1. Select your country
+            </label>
+            <SearchableSelect
+              id="country"
+              name="country"
+              control={control}
+              options={countries}
+            />
+          </fieldset>
+          <fieldset className="grid gap-3">
+            <label htmlFor="budget" className="text-base text-white">
+              <span className="rounded-full text-gray-400">2.</span> Input your
+              budget with the currency
+            </label>
+            <input
+              id="budget"
+              type="text"
+              className="w-full rounded-md border-gray-400 bg-neutral-800 py-2.5 px-4 text-white placeholder:text-gray-400"
+              placeholder="e.g. 6969 BDT"
+              {...register("budget", { required: true })}
+            />
+          </fieldset>
+          <fieldset className="grid gap-3">
+            <label htmlFor="duration" className="text-base text-white">
+              <span className="rounded-full text-gray-400">3.</span> Input your
+              tour duration (days)
+            </label>
+            <input
+              id="duration"
+              type="number"
+              className="w-full rounded-md border-gray-400 bg-neutral-800 py-2.5 px-4 text-white placeholder:text-gray-400"
+              placeholder="e.g. 10"
+              inputMode="numeric"
+              {...register("duration", { required: true, valueAsNumber: true })}
+            />
+          </fieldset>
+          <button
+            aria-label="generate cities"
+            className="mt-1.5 w-full rounded-md bg-gray-100 px-4 py-2 text-base font-medium transition-colors enabled:hover:bg-gray-300 enabled:active:bg-gray-100 disabled:cursor-not-allowed"
+          >
+            Generate Cities
+          </button>
+        </form>
       </main>
     </>
   );

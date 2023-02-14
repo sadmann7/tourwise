@@ -16,7 +16,7 @@ model Example {
 model Tour {
     id        String   @id @default(cuid())
     country   String
-    budget    Int
+    budget    String
     duration  Int
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

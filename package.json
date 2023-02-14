@@ -10,12 +10,15 @@
     "start": "next start"
   },
   "dependencies": {
+    "@headlessui/react": "^1.7.10",
+    "@heroicons/react": "^2.0.15",
     "@prisma/client": "^4.9.0",
     "@tanstack/react-query": "^4.20.0",
     "@trpc/client": "^10.9.0",
     "@trpc/next": "^10.9.0",
     "@trpc/react-query": "^10.9.0",
     "@trpc/server": "^10.9.0",
+    "framer-motion": "^9.0.2",
     "next": "13.1.6",
     "openai": "^3.1.0",
     "react": "18.2.0",
