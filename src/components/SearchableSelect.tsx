@@ -29,7 +29,10 @@ const SearchableSelect = <TInputs extends FieldValues>({
     <Controller
       control={control}
       name={name}
-      rules={{ required: true }}
+      rules={{
+        required: true,
+        validate: (value) => value !== null,
+      }}
       render={({ field: { onChange } }) => (
         <Combobox
           value={selected}

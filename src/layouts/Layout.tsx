@@ -5,8 +5,6 @@ import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 
 const Layout = ({ children }: { children: ReactNode }) => {
-  // place footer at the bottom of the page
-
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
