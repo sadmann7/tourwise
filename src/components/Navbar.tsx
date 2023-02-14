@@ -19,22 +19,22 @@ const Navbar = () => {
           className="flex items-center gap-2 text-base text-white transition-opacity hover:opacity-80 active:opacity-90"
         >
           <FaRegPaperPlane />
-          <span className="font-mono">Next Tour</span>
+          <span className="hidden font-mono sm:block">Next Tour</span>
         </Link>
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center">
           <a
             aria-label="navigate to github repo"
             href="https://github.com/sadmann7/next-tour"
             target="_blank"
             rel="noreferrer"
-            className="rounded-md bg-transparent px-3 py-1 font-mono text-base text-white transition-colors hover:bg-neutral-700 active:bg-neutral-800"
+            className="rounded-md bg-transparent px-2.5 py-1 font-mono text-base text-white transition-colors hover:bg-neutral-700 active:bg-neutral-800"
           >
             Repository
           </a>
           <Link
             aria-label="navigate to favourited places page"
             href={"/favourited"}
-            className={`rounded-md px-3 py-1 font-mono text-base text-white transition-colors hover:bg-neutral-700 active:bg-neutral-800 ${
+            className={`rounded-md px-2.5 py-1 font-mono text-base text-white transition-colors hover:bg-neutral-700 active:bg-neutral-800 ${
               router.pathname === "/favourited"
                 ? "bg-neutral-700"
                 : "bg-transparent"
