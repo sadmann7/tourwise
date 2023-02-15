@@ -1,12 +1,18 @@
 import { motion } from "framer-motion";
+import type { HTMLAttributes } from "react";
 import { useEffect, useState } from "react";
 
 type AnimatedTextProps = {
   words: string[];
   defaultWord?: string;
-} & React.HTMLAttributes<HTMLSpanElement>;
+} & HTMLAttributes<HTMLDivElement>;
 
-const AnimatedText = ({ className, words, defaultWord }: AnimatedTextProps) => {
+const AnimatedText = ({
+  words,
+  defaultWord,
+  className,
+  ...props
+}: AnimatedTextProps) => {
   const [word, setWord] = useState<string>(defaultWord ?? "Word");
   const [replay, setReplay] = useState<boolean>(true);
 
@@ -18,8 +24,8 @@ const AnimatedText = ({ className, words, defaultWord }: AnimatedTextProps) => {
       setReplay(!replay);
       setTimeout(() => {
         setReplay(true);
-      }, 200);
-    }, 4000);
+      }, 1000);
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [words, replay]);
@@ -42,18 +48,20 @@ const AnimatedText = ({ className, words, defaultWord }: AnimatedTextProps) => {
   };
 
   return (
-    <motion.span
-      className={className}
-      variants={container}
-      initial="hidden"
-      animate={replay ? "visible" : "hidden"}
-    >
-      {word.split("").map((letter, index) => (
-        <motion.span key={index} variants={item}>
-          {letter}
-        </motion.span>
-      ))}
-    </motion.span>
+    <div className={className} {...props}>
+      <motion.span
+        className="bg-gradient-to-r bg-clip-text text-transparent"
+        variants={container}
+        initial="hidden"
+        animate={replay ? "visible" : "hidden"}
+      >
+        {word.split("").map((letter, index) => (
+          <motion.span key={index} variants={item}>
+            {letter}
+          </motion.span>
+        ))}
+      </motion.span>
+    </div>
   );
 };
 

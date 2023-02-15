@@ -30,13 +30,13 @@ const CountUp = ({
   }, [end, duration]);
 
   return (
-    <div
+    <span
       aria-label="count up from 0 to actual number"
       className={className}
       style={{ transitionDelay: `${delay}ms` }}
     >
       {count.toFixed(0)}
-    </div>
+    </span>
   );
 };
 
