@@ -3,11 +3,11 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import type { NextPageWithLayout } from "./_app";
 
 // external imports
+import AnimatedText from "@/components/AnimatedText";
+import CountUp from "@/components/CountUp";
 import SearchableSelect from "@/components/SearchableSelect";
 import rawCountries from "@/data/countries.json";
 import Layout from "@/layouts/Layout";
-import AnimatedText from "@/components/AnimatedText";
-import CountUp from "@/components/CountUp";
 
 type Inputs = {
   country: string;
@@ -57,7 +57,6 @@ const Home: NextPageWithLayout = () => {
               1. Select your country
             </label>
             <SearchableSelect
-              id="country"
               name="country"
               control={control}
               options={countries}

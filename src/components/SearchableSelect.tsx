@@ -1,5 +1,4 @@
 import { Combobox, Transition } from "@headlessui/react";
-import type { HTMLAttributes } from "react";
 import { Fragment, useState } from "react";
 import type { Control, FieldValues, Path } from "react-hook-form";
 import { Controller } from "react-hook-form";
@@ -8,7 +7,7 @@ type SearchableSelectProps<TInputs extends FieldValues> = {
   control: Control<TInputs, any>;
   name: Path<TInputs>;
   options: string[];
-} & HTMLAttributes<HTMLDivElement>;
+};
 
 const SearchableSelect = <TInputs extends FieldValues>({
   control,
@@ -21,9 +20,9 @@ const SearchableSelect = <TInputs extends FieldValues>({
   const filteredOptions =
     query === ""
       ? options
-      : options.filter((option) => {
-          return option.toLowerCase().includes(query.toLowerCase());
-        });
+      : options.filter((option) =>
+          option.toLowerCase().includes(query.toLowerCase())
+        );
 
   return (
     <Controller
@@ -44,7 +43,7 @@ const SearchableSelect = <TInputs extends FieldValues>({
           <div className="relative mt-1">
             <Combobox.Input
               className="w-full rounded-md border-gray-400 bg-neutral-800 px-4 py-2.5 text-white placeholder:text-gray-400"
-              placeholder="Search for a country..."
+              placeholder="Search for a country"
               onChange={(event) => setQuery(event.target.value)}
             />
             <Transition

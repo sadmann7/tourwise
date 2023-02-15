@@ -40,4 +40,5 @@ model Place {
     updatedAt DateTime @updatedAt
     city      City     @relation(fields: [cityId], references: [id], onDelete: Cascade)
     cityId    String
+    favorites Int
 }

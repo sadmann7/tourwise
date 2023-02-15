@@ -21,7 +21,7 @@ const Navbar = () => {
           <FaRegPaperPlane />
           <span className="hidden font-mono sm:block">Next Tour</span>
         </Link>
-        <div className="flex items-center">
+        <div className="flex items-center gap-2">
           <a
             aria-label="navigate to github repo"
             href="https://github.com/sadmann7/next-tour"
@@ -29,18 +29,18 @@ const Navbar = () => {
             rel="noreferrer"
             className="rounded-md bg-transparent px-2.5 py-1 font-mono text-base text-white transition-colors hover:bg-neutral-700 active:bg-neutral-800"
           >
-            Repository
+            Repo
           </a>
           <Link
             aria-label="navigate to favourited places page"
-            href={"/favourited"}
+            href={"/places/popular-places"}
             className={`rounded-md px-2.5 py-1 font-mono text-base text-white transition-colors hover:bg-neutral-700 active:bg-neutral-800 ${
-              router.pathname === "/favourited"
+              router.pathname === "/places/popular-places"
                 ? "bg-neutral-700"
                 : "bg-transparent"
             }`}
           >
-            Favourited
+            Popular <span className="hidden sm:inline">Places</span>
           </Link>
         </div>
       </nav>

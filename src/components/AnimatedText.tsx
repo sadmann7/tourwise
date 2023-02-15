@@ -25,7 +25,7 @@ const AnimatedText = ({
       setTimeout(() => {
         setReplay(true);
       }, 1000);
-    }, 3000);
+    }, 4000);
 
     return () => clearInterval(interval);
   }, [words, replay]);
