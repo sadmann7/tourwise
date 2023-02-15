@@ -1,22 +1,29 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Preference, Season } from "@prisma/client";
 import { AnimatePresence, motion } from "framer-motion";
 import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
+import { z } from "zod";
 import type { NextPageWithLayout } from "./_app";
 
 // external imports
 import AnimatedText from "@/components/AnimatedText";
 import CountUp from "@/components/CountUp";
+import SelectBox from "@/components/DropdownSelect";
 import SearchableSelect from "@/components/SearchableSelect";
 import rawCountries from "@/data/countries.json";
 import Layout from "@/layouts/Layout";
 import { api } from "@/utils/api";
+import Button from "@/components/Button";
 
-type Inputs = {
-  country: string;
-  budget: string;
-  duration: number;
-};
+const schema = z.object({
+  country: z.string({ required_error: "Please select a country" }),
+  preference: z.nativeEnum(Preference),
+  season: z.nativeEnum(Season),
+});
+
+type Inputs = z.infer<typeof schema>;
 
 const Home: NextPageWithLayout = () => {
   const countries = rawCountries.map((country) => country.name);
@@ -34,11 +41,11 @@ const Home: NextPageWithLayout = () => {
   });
 
   // react-hook-form
-  const { register, handleSubmit, control, formState } = useForm<Inputs>();
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    await placesMutaion.mutateAsync(data);
-    if (!placesMutaion.data) return;
-    setPlaces(placesMutaion.data.split(" "));
+  const { handleSubmit, control, formState } = useForm<Inputs>({
+    resolver: zodResolver(schema),
+  });
+  const onSubmit: SubmitHandler<Inputs> = (data) => {
+    console.log(data);
   };
 
   // framer motion
@@ -103,54 +110,52 @@ const Home: NextPageWithLayout = () => {
             />
             {formState.errors.country ? (
               <span className="text-base text-red-500">
-                Please select a country
+                {formState.errors.country.message}
               </span>
             ) : null}
           </fieldset>
           <fieldset className="grid gap-3">
-            <label htmlFor="budget" className="text-base text-white">
-              <span className="rounded-full text-gray-400">2.</span> Input your
-              budget with the currency
+            <label htmlFor="preference" className="text-base text-white">
+              <span className="rounded-full text-gray-400">2.</span> Select your
+              tour preference
             </label>
-            <input
-              id="budget"
-              type="text"
-              className="w-full rounded-md border-gray-400 bg-neutral-800 py-2.5 px-4 text-white placeholder:text-gray-400"
-              placeholder="e.g. 6969 BDT"
-              {...register("budget", { required: true })}
+            <SelectBox
+              name="preference"
+              control={control}
+              options={Object.values(Preference)}
             />
-            {formState.errors.budget ? (
+
+            {formState.errors.preference ? (
               <span className="text-base text-red-500">
-                Please input your budget
+                {formState.errors.preference.message}
               </span>
             ) : null}
           </fieldset>
           <fieldset className="grid gap-3">
-            <label htmlFor="duration" className="text-base text-white">
-              <span className="rounded-full text-gray-400">3.</span> Input your
-              tour duration (days)
+            <label htmlFor="season" className="text-base text-white">
+              <span className="rounded-full text-gray-400">3.</span> Select your
+              tour season
             </label>
-            <input
-              id="duration"
-              type="number"
-              className="w-full rounded-md border-gray-400 bg-neutral-800 py-2.5 px-4 text-white placeholder:text-gray-400"
-              placeholder="e.g. 10"
-              inputMode="numeric"
-              {...register("duration", { required: true, valueAsNumber: true })}
+            <SelectBox
+              name="season"
+              control={control}
+              options={Object.values(Season)}
             />
-            {formState.errors.duration ? (
+
+            {formState.errors.season ? (
               <span className="text-base text-red-500">
-                Please input your tour duration
+                {formState.errors.season.message}
               </span>
             ) : null}
           </fieldset>
-          <button
+          <Button
             aria-label="generate your places"
-            className="mt-1.5 w-full rounded-md bg-indigo-600 px-4 py-2 text-base font-medium text-white transition-colors enabled:hover:bg-indigo-700 enabled:active:bg-indigo-600 disabled:cursor-not-allowed"
+            variant="primary"
+            loading={placesMutaion.isLoading}
             disabled={placesMutaion.isLoading}
           >
             {placesMutaion.isLoading ? "Loading..." : "Generate your places"}
-          </button>
+          </Button>
         </form>
         {places ? (
           <AnimatePresence mode="wait">

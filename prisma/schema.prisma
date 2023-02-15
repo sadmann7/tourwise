@@ -8,21 +8,36 @@ datasource db {
 }
 
 model Tour {
-    id        String   @id @default(cuid())
-    country   String
-    budget    String
-    duration  Int
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    places    Place[]
+    id         String     @id @default(cuid())
+    country    String
+    preference Preference @default(Adventure)
+    season     Season     @default(Winter)
+    createdAt  DateTime   @default(now())
+    updatedAt  DateTime   @updatedAt
+    places     Place[]
 }
 
 model Place {
-    id         String   @id @default(cuid())
-    name       String
-    createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt
-    tour       Tour     @relation(fields: [tourId], references: [id])
-    tourId     String
-    favourites Int      @default(0)
+    id        String   @id @default(cuid())
+    name      String
+    country   String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    tour      Tour?    @relation(fields: [tourId], references: [id], onDelete: Cascade)
+    tourId    String?
+}
+
+enum Preference {
+    Adventure
+    Culture
+    Food
+    Relaxation
+    Nature
+}
+
+enum Season {
+    Winter
+    Spring
+    Summer
+    Autumn
 }

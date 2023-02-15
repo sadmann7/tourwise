@@ -10,7 +10,7 @@ const Navbar = () => {
   return (
     <header
       aria-label="header"
-      className="fixed top-0 left-0 z-20 flex w-full items-center gap-4 bg-neutral-900"
+      className="fixed top-0 left-0 z-20 flex w-full items-center gap-4 bg-black"
     >
       <nav className="container mx-auto flex max-w-5xl items-center justify-between border-b-2 border-b-gray-500 px-4 py-5">
         <Link

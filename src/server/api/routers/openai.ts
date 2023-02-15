@@ -1,4 +1,5 @@
 import { configuration } from "@/utils/openai";
+import { Preference, Season } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
@@ -8,8 +9,8 @@ export const openaiRouter = createTRPCRouter({
     .input(
       z.object({
         country: z.string(),
-        budget: z.string(),
-        duration: z.number(),
+        preference: z.nativeEnum(Preference),
+        season: z.nativeEnum(Season),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -21,7 +22,7 @@ export const openaiRouter = createTRPCRouter({
         });
       }
 
-      const prompt = `I want to go to ${input.country} for ${input.duration} days and I want to spend ${input.budget}. Where should I go?`;
+      const prompt = `I want to go to a place in ${input.country} that is ${input.preference} and ${input.season}.\n\nHere are some places I like:\n\n- [Place 1](https://www.google.com)\n- [Place 2](https://www.google.com)\n- [Place 3](https://www.google.com)\n- [Place 4](https://www.google.com)\n- [Place 5](https://www.google.com)\n\nI want to go to a place that is ${input.preference} and ${input.season}.`;
 
       if (!prompt) {
         throw new TRPCError({
