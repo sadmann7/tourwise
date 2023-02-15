@@ -7,12 +7,6 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Example {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-}
-
 model Tour {
     id        String   @id @default(cuid())
     country   String
@@ -20,25 +14,15 @@ model Tour {
     duration  Int
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
-    cities    City[]
-}
-
-model City {
-    id        String   @id @default(cuid())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    tour      Tour     @relation(fields: [tourId], references: [id], onDelete: Cascade)
-    tourId    String
     places    Place[]
 }
 
 model Place {
-    id        String   @id @default(cuid())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    city      City     @relation(fields: [cityId], references: [id], onDelete: Cascade)
-    cityId    String
-    favorites Int
+    id         String   @id @default(cuid())
+    name       String
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+    tour       Tour     @relation(fields: [tourId], references: [id])
+    tourId     String
+    favourites Int      @default(0)
 }

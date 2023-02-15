@@ -11,7 +11,6 @@ import SearchableSelect from "@/components/SearchableSelect";
 import rawCountries from "@/data/countries.json";
 import Layout from "@/layouts/Layout";
 import { api } from "@/utils/api";
-import Router from "next/router";
 
 type Inputs = {
   country: string;
@@ -21,21 +20,11 @@ type Inputs = {
 
 const Home: NextPageWithLayout = () => {
   const countries = rawCountries.map((country) => country.name);
-  const [cities, setCities] = useState<string[] | undefined>(undefined);
+  const [places, setPlaces] = useState<string[]>();
   const generatedRef = useRef<HTMLDivElement>(null);
 
-  // genereate cities mutation
-  const citiesMutation = api.openai.generateCities.useMutation({
-    onSuccess: (data) => {
-      console.log(data);
-    },
-    onError: (error) => {
-      console.log(error);
-    },
-  });
-
-  // generate places mutation
-  const placesMutation = api.openai.generatePlaces.useMutation({
+  // genereate places mutation
+  const placesMutaion = api.openai.generatePlaces.useMutation({
     onSuccess: (data) => {
       console.log(data);
     },
@@ -47,12 +36,9 @@ const Home: NextPageWithLayout = () => {
   // react-hook-form
   const { register, handleSubmit, control, formState } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    await citiesMutation.mutateAsync(data);
-    const generatedCities = citiesMutation.data
-      ?.split(/1\.|2\.|3\.|4\.|5\./g)
-      .map((city) => city.replace(/\n/g, "").trim())
-      .filter((city) => city !== "");
-    setCities(generatedCities);
+    await placesMutaion.mutateAsync(data);
+    if (!placesMutaion.data) return;
+    setPlaces(placesMutaion.data.split(" "));
   };
 
   // framer motion
@@ -75,7 +61,7 @@ const Home: NextPageWithLayout = () => {
   useEffect(() => {
     if (!generatedRef.current) return;
     generatedRef.current.scrollIntoView({ behavior: "smooth" });
-  }, [cities]);
+  }, [places]);
 
   return (
     <>
@@ -91,7 +77,7 @@ const Home: NextPageWithLayout = () => {
             destination with AI
           </h1>
           <span className="text-center text-lg text-gray-400 sm:text-xl">
-            Total <CountUp className="text-indigo-500" end={69} /> suggestions
+            Total <CountUp className="text-indigo-500" end={69} /> destinations
             generated so far
           </span>
           <AnimatedText
@@ -159,21 +145,21 @@ const Home: NextPageWithLayout = () => {
             ) : null}
           </fieldset>
           <button
-            aria-label="generate cities"
+            aria-label="generate your places"
             className="mt-1.5 w-full rounded-md bg-indigo-600 px-4 py-2 text-base font-medium text-white transition-colors enabled:hover:bg-indigo-700 enabled:active:bg-indigo-600 disabled:cursor-not-allowed"
-            disabled={citiesMutation.isLoading}
+            disabled={placesMutaion.isLoading}
           >
-            {citiesMutation.isLoading ? "Loading..." : "Generate cities"}
+            {placesMutaion.isLoading ? "Loading..." : "Generate your places"}
           </button>
         </form>
-        {cities ? (
+        {places ? (
           <AnimatePresence mode="wait">
             <motion.div
               ref={generatedRef}
               className="mx-auto grid w-full max-w-2xl gap-8"
             >
               <h2 className="text-center text-3xl font-bold text-white sm:text-4xl">
-                Your generated cities
+                Your generated destinations
               </h2>
               <motion.div
                 className="grid w-full place-items-center gap-3"
@@ -181,19 +167,14 @@ const Home: NextPageWithLayout = () => {
                 initial="hidden"
                 animate="visible"
               >
-                {cities.map((city) => (
+                {places.map((place) => (
                   <motion.div
-                    key={city}
+                    key={place}
                     className="w-full max-w-2xl rounded-md bg-neutral-800 p-4 shadow-md ring-1 ring-gray-500"
                     variants={item}
-                    onClick={() =>
-                      placesMutation.mutate({
-                        city: city,
-                      })
-                    }
                   >
                     <h3 className="text-base font-semibold text-white">
-                      {city}
+                      {place}
                     </h3>
                   </motion.div>
                 ))}
