@@ -54,7 +54,8 @@ const Home: NextPageWithLayout = () => {
         >
           <fieldset className="grid gap-3">
             <label htmlFor="country" className="text-base text-white">
-              1. Select your country
+              <span className="rounded-full text-gray-400">1.</span> Select your
+              country
             </label>
             <SearchableSelect
               name="country"

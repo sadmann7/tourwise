@@ -13,6 +13,7 @@ const SearchableSelect = <TInputs extends FieldValues>({
   control,
   name,
   options,
+  ...props
 }: SearchableSelectProps<TInputs>) => {
   const [selected, setSelected] = useState<string | null>(null);
   const [query, setQuery] = useState<string>("");
@@ -45,6 +46,7 @@ const SearchableSelect = <TInputs extends FieldValues>({
               className="w-full rounded-md border-gray-400 bg-neutral-800 px-4 py-2.5 text-white placeholder:text-gray-400"
               placeholder="Search for a country"
               onChange={(event) => setQuery(event.target.value)}
+              {...props}
             />
             <Transition
               as={Fragment}

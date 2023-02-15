@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
-import type { HTMLAttributes } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type HTMLAttributes } from "react";
 
 type AnimatedTextProps = {
   words: string[];
