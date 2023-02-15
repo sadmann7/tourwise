@@ -19,7 +19,7 @@ export type OpenAIStreamPayload = {
 export interface NextApiRequestWithBody extends NextApiRequest {
   body: {
     country: string;
-    buddget: number;
+    budget: number;
     duration: number;
   };
 }

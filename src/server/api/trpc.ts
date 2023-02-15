@@ -17,10 +17,10 @@
  */
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 
+import { openai } from "@/utils/openai";
 import { prisma } from "../db";
 
 type CreateContextOptions = Record<string, never>;
-
 /**
  * This helper generates the "internals" for a tRPC context. If you need to use
  * it, you can export it from here.
@@ -34,6 +34,7 @@ type CreateContextOptions = Record<string, never>;
 const createInnerTRPCContext = (_opts: CreateContextOptions) => {
   return {
     prisma,
+    openai,
   };
 };
 

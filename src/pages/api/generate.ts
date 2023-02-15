@@ -1,16 +1,9 @@
-import type {
-  NextApiRequestWithBody,
-  OpenAIStreamPayload,
-} from "@/types/globals";
-import { sanitize } from "@/utils/format";
-import { configuration } from "@/utils/openai";
+import type { NextApiRequestWithBody } from "@/types/globals";
+import { configuration, openai } from "@/utils/openai";
 import type { NextApiResponse } from "next";
-import { OpenAIApi } from "openai";
-
-export const openai = new OpenAIApi(configuration);
 
 type Data = {
-  suggestions: string;
+  result: string;
 };
 
 type Error = {
@@ -33,54 +26,30 @@ export default async function handler(
     return;
   }
 
-  const { country, buddget, duration } = req.body;
-  const prompt = `Suggest 5 cities in js array format for ${country} that are good for ${duration} days with a budget of ${buddget}`;
+  const { budget, country, duration } = req.body;
+  const prompt = `Suggest 5 cities to travel in js array format for ${country} that are good for ${duration} days with a budget of ${budget}`;
 
-  if (!prompt) {
-    res.status(400).json({
-      error: {
-        message: "Prompt is missing",
-      },
+  try {
+    const completion = await openai.createCompletion({
+      model: "text-davinci-003",
+      prompt: prompt,
+      temperature: 0.7,
+      max_tokens: 200,
+      top_p: 1,
+      frequency_penalty: 0,
+      presence_penalty: 0,
+      stream: false,
+      n: 1,
     });
-    return;
-  }
-
-  const openaiPayload: OpenAIStreamPayload = {
-    model: "text-davinci-003",
-    prompt,
-    temperature: 0.69,
-    max_tokens: 69,
-    top_p: 1,
-    frequency_penalty: 0,
-    presence_penalty: 0,
-    stream: true,
-    n: 1,
-  };
-
-  const completion = await openai.createCompletion(openaiPayload);
-  if (!completion.data.choices) {
+    res
+      .status(200)
+      .json({ result: completion.data.choices[0]?.text as string });
+  } catch (error) {
+    console.error(`Error with OpenAI API request: ${error as string}}`);
     res.status(500).json({
       error: {
-        message: "OpenAI API error",
+        message: "An error occurred during your request.",
       },
     });
-    return;
-  } else if (completion.data.choices.length === 0) {
-    res.status(500).json({
-      error: {
-        message: "OpenAI API error",
-      },
-    });
-    return;
   }
-  const suggestions = completion.data.choices[0]?.text;
-  if (!suggestions) {
-    res.status(500).json({
-      error: {
-        message: "OpenAI API error",
-      },
-    });
-    return;
-  }
-  res.status(200).json({ suggestions: sanitize(suggestions) });
 }

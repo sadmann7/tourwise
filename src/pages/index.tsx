@@ -8,6 +8,7 @@ import CountUp from "@/components/CountUp";
 import SearchableSelect from "@/components/SearchableSelect";
 import rawCountries from "@/data/countries.json";
 import Layout from "@/layouts/Layout";
+import { api } from "@/utils/api";
 
 type Inputs = {
   country: string;
@@ -18,10 +19,34 @@ type Inputs = {
 const Home: NextPageWithLayout = () => {
   const countries = rawCountries.map((country) => country.name);
 
+  // genereate query
+  const generateQuery = api.openai.generateCities.useMutation({
+    onSuccess: (data) => {
+      console.log(data);
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
   // react-hook-form
   const { register, handleSubmit, control, formState } = useForm<Inputs>();
-  const onSubmit: SubmitHandler<Inputs> = (data) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    // const response = await fetch("/api/generate", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify(data),
+    // });
+
+    // if (!response.ok) {
+    //   throw new Error("Something went wrong");
+    // }
+    // const responseData = await response.json();
+    // console.log(responseData);
+
+    await generateQuery.mutateAsync(data);
   };
 
   return (
