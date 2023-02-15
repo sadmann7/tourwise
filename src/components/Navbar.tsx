@@ -33,14 +33,14 @@ const Navbar = () => {
           </a>
           <Link
             aria-label="navigate to favourited places page"
-            href={"/places/popular-places"}
+            href={"/places/top-rated"}
             className={`rounded-md px-2.5 py-1 font-mono text-base text-white transition-colors hover:bg-neutral-700 active:bg-neutral-800 ${
-              router.pathname === "/places/popular-places"
+              router.pathname === "/places/top-rated"
                 ? "bg-neutral-700"
                 : "bg-transparent"
             }`}
           >
-            Popular <span className="hidden sm:inline">Places</span>
+            Top Places
           </Link>
         </div>
       </nav>

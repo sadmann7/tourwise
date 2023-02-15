@@ -38,7 +38,7 @@ const Home: NextPageWithLayout = () => {
             destination with AI
           </h1>
           <span className="text-center text-lg text-gray-400 sm:text-xl">
-            Total <CountUp className="text-indigo-500" end={69} /> destinations
+            Total <CountUp className="text-indigo-500" end={69} /> suggestions
             generated so far
           </span>
           <AnimatedText
