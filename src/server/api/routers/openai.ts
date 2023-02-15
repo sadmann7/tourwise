@@ -1,7 +1,6 @@
 import { configuration } from "@/utils/openai";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
 export const openaiRouter = createTRPCRouter({
@@ -22,7 +21,7 @@ export const openaiRouter = createTRPCRouter({
         });
       }
 
-      const prompt = `Suggest 5 cities to travel in js array format for ${input.country} that are good for ${input.duration} days with a budget of ${input.budget}`;
+      const prompt = `Suggest 5 cities (name only) to travel in proper 1. to 5. numbering for ${input.country} that are good for ${input.duration} days with a budget of ${input.budget}`;
 
       if (!prompt) {
         throw new TRPCError({
@@ -67,10 +66,7 @@ export const openaiRouter = createTRPCRouter({
   generatePlaces: publicProcedure
     .input(
       z.object({
-        country: z.string(),
         city: z.string(),
-        budget: z.string(),
-        duration: z.number(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -82,7 +78,7 @@ export const openaiRouter = createTRPCRouter({
         });
       }
 
-      const prompt = `Suggest 5 places to travel in js array format for ${input.country} and ${input.city} that are good for ${input.duration} days with a budget of ${input.budget}`;
+      const prompt = `Suggest 5 places to travel in js array format for ${input.city}`;
 
       if (!prompt) {
         throw new TRPCError({
