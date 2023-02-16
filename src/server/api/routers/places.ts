@@ -23,6 +23,34 @@ export const placesRouter = createTRPCRouter({
     return uniquePlaces;
   }),
 
+  getPaginatedUnique: publicProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(100),
+        cursor: z.string().nullish(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const uniquePlaces = await ctx.prisma.uniquePlace.findMany({
+        take: input.limit + 1,
+        where: {},
+        cursor: input.cursor ? { id: input.cursor } : undefined,
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+      let nextCursor: typeof input.cursor | undefined = undefined;
+      if (uniquePlaces.length > input.limit) {
+        const nextItem = uniquePlaces.pop();
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        nextCursor = nextItem!.id;
+      }
+      return {
+        uniquePlaces,
+        nextCursor,
+      };
+    }),
+
   updateLike: publicProcedure
     .input(
       z.object({

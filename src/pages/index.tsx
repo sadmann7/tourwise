@@ -203,6 +203,7 @@ type PlaceCardProps = {
 
 const PlaceCard = ({ place }: PlaceCardProps) => {
   const [isLiked, setIsLiked] = useState(false);
+  const apiUtils = api.useContext();
 
   // framer motion
   const item = {
@@ -212,12 +213,38 @@ const PlaceCard = ({ place }: PlaceCardProps) => {
 
   // update like mutation for unique places
   const updateLikeMutation = api.places.updateLike.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       if (isLiked) {
         toast.error("Remove from Top Places");
       } else {
         toast.success("Added to Top Places");
       }
+      await apiUtils.places.getPaginatedUnique.cancel();
+      apiUtils.places.getPaginatedUnique.setInfiniteData(
+        { limit: 10 },
+        (data) => {
+          if (!data) {
+            return {
+              pages: [],
+              pageParams: [],
+            };
+          }
+          return {
+            ...data,
+            pages: data.pages.map((page) => {
+              return {
+                ...page,
+                uniquePlaces: page.uniquePlaces.map((place) => {
+                  return {
+                    ...place,
+                    isDeleted: true,
+                  };
+                }),
+              };
+            }),
+          };
+        }
+      );
     },
     onError: (error) => {
       toast.error(error.message);
@@ -228,7 +255,7 @@ const PlaceCard = ({ place }: PlaceCardProps) => {
     <motion.div
       key={place.name}
       variants={item}
-      className="grid gap-4 rounded-lg bg-neutral-800 p-4 shadow-md ring-1 ring-gray-400"
+      className="grid gap-4 rounded-md bg-neutral-800 p-4 shadow-md ring-1 ring-gray-400"
     >
       <div className="grid gap-2">
         <div className="flex items-center justify-between gap-2">
@@ -253,26 +280,26 @@ const PlaceCard = ({ place }: PlaceCardProps) => {
       </div>
       <div className="grid gap-2">
         <a
-          aria-label="view on google maps"
+          aria-label="explore on google maps"
           href={`https://www.google.com/maps/search/?api=1&query=${
             place.name ?? ""
           }`}
           target="_blank"
           rel="noreferrer"
-          className="flex items-center justify-center gap-2 rounded-lg bg-gray-100 p-2 transition-colors hover:bg-gray-300 active:bg-gray-100"
+          className="flex items-center justify-center gap-2 rounded-md bg-gray-100 p-2 transition-colors hover:bg-gray-300 active:bg-gray-100"
         >
           <FaMap className="aspect-square w-5" aria-hidden="true" />
-          <span className="text-sm font-medium">View on Google Maps</span>
+          <span className="text-sm font-medium">Explore on Google Maps</span>
         </a>
         <a
-          aria-label="view on wikipedia"
+          aria-label="explore on wikipedia"
           href={`https://en.wikipedia.org/wiki/${place.name ?? ""}`}
           target="_blank"
           rel="noreferrer"
-          className="flex items-center justify-center gap-2 rounded-lg bg-gray-100 p-2 transition-colors hover:bg-gray-300 active:bg-gray-100"
+          className="flex items-center justify-center gap-2 rounded-md bg-gray-100 p-2 transition-colors hover:bg-gray-300 active:bg-gray-100"
         >
           <FaWikipediaW className="aspect-square w-5" aria-hidden="true" />
-          <span className="text-sm font-medium">View on Wikipedia</span>
+          <span className="text-sm font-medium">Explore on Wikipedia</span>
         </a>
       </div>
     </motion.div>
