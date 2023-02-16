@@ -1,3 +1,4 @@
+import { env } from "@/env.mjs";
 import { configuration } from "@/utils/openai";
 import { PREFERENCE, SEASON } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
@@ -32,17 +33,25 @@ export const openaiRouter = createTRPCRouter({
         });
       }
 
-      const completion = await ctx.openai.createCompletion({
-        model: "text-davinci-003",
-        prompt: prompt,
-        temperature: 0.7,
-        max_tokens: 250,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0,
-        stream: false,
-        n: 1,
-      });
+      const completion = await ctx.openai.createCompletion(
+        {
+          model: "text-davinci-003",
+          prompt: prompt,
+          temperature: 0.7,
+          max_tokens: 250,
+          top_p: 1,
+          frequency_penalty: 0,
+          presence_penalty: 0,
+          stream: false,
+          n: 1,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${env.OPENAI_API_KEY ?? ""}`,
+          },
+        }
+      );
       if (!completion.data.choices) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",

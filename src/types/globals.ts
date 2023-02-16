@@ -1,3 +1,4 @@
+import type { PREFERENCE, SEASON } from "@prisma/client";
 import type { NextApiRequest } from "next";
 
 export type OpenAIStreamPayload = {
@@ -19,7 +20,7 @@ export type OpenAIStreamPayload = {
 export interface NextApiRequestWithBody extends NextApiRequest {
   body: {
     country: string;
-    budget: number;
-    duration: number;
+    preference: PREFERENCE;
+    season: SEASON;
   };
 }
