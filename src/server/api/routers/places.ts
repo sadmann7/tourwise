@@ -4,26 +4,7 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
 export const placesRouter = createTRPCRouter({
-  get: publicProcedure.query(async ({ ctx }) => {
-    const places = await ctx.prisma.place.findMany({
-      include: {
-        tour: true,
-      },
-    });
-    return places;
-  }),
-
-  getTotal: publicProcedure.query(async ({ ctx }) => {
-    const totalPlaces = (await ctx.prisma.place.findMany()).length;
-    return totalPlaces;
-  }),
-
-  getUnique: publicProcedure.query(async ({ ctx }) => {
-    const uniquePlaces = await ctx.prisma.uniquePlace.findMany();
-    return uniquePlaces;
-  }),
-
-  getPaginatedUnique: publicProcedure
+  getPaginated: publicProcedure
     .input(
       z.object({
         limit: z.number().min(1).max(100),
@@ -31,7 +12,7 @@ export const placesRouter = createTRPCRouter({
       })
     )
     .query(async ({ ctx, input }) => {
-      const uniquePlaces = await ctx.prisma.uniquePlace.findMany({
+      const places = await ctx.prisma.place.findMany({
         take: input.limit + 1,
         where: {},
         cursor: input.cursor ? { id: input.cursor } : undefined,
@@ -40,15 +21,43 @@ export const placesRouter = createTRPCRouter({
         },
       });
       let nextCursor: typeof input.cursor | undefined = undefined;
-      if (uniquePlaces.length > input.limit) {
-        const nextItem = uniquePlaces.pop();
+      if (places.length > input.limit) {
+        const nextItem = places.pop();
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         nextCursor = nextItem!.id;
       }
       return {
-        uniquePlaces,
+        places,
         nextCursor,
       };
+    }),
+
+  getCount: publicProcedure.query(async ({ ctx }) => {
+    const first = await ctx.prisma.placeCounter.findFirst();
+    return first?.count;
+  }),
+
+  increaseCount: publicProcedure
+    .input(z.number())
+    .mutation(async ({ ctx, input }) => {
+      const first = await ctx.prisma.placeCounter.findFirst();
+      if (!first) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Counter not found",
+        });
+      }
+      const updated = await ctx.prisma.placeCounter.update({
+        where: {
+          id: first.id,
+        },
+        data: {
+          count: {
+            increment: input,
+          },
+        },
+      });
+      return updated;
     }),
 
   updateLike: publicProcedure
@@ -63,13 +72,13 @@ export const placesRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const place = await ctx.prisma.uniquePlace.findUnique({
+      const place = await ctx.prisma.place.findUnique({
         where: {
           name: input.name,
         },
       });
       if (!place) {
-        const newPlace = await ctx.prisma.uniquePlace.create({
+        const newPlace = await ctx.prisma.place.create({
           data: {
             name: input.name,
             description: input.description,
@@ -81,7 +90,7 @@ export const placesRouter = createTRPCRouter({
         });
         return newPlace;
       }
-      const updatedPlace = await ctx.prisma.uniquePlace.update({
+      const updatedPlace = await ctx.prisma.place.update({
         where: {
           name: input.name,
         },
@@ -102,7 +111,7 @@ export const placesRouter = createTRPCRouter({
         });
       }
       if (updatedPlace.like === 0) {
-        await ctx.prisma.uniquePlace.delete({
+        await ctx.prisma.place.delete({
           where: {
             name: input.name,
           },

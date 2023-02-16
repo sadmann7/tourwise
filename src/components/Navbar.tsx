@@ -32,10 +32,10 @@ const Navbar = () => {
             Repo
           </a>
           <Link
-            aria-label="navigate to favourited places page"
-            href={"/places/top-rated"}
+            aria-label="navigate to top rated places page"
+            href={"/top-places"}
             className={`rounded-md px-2.5 py-1 font-mono text-base text-white transition-colors hover:bg-neutral-700 active:bg-neutral-800 ${
-              router.pathname === "/places/top-rated"
+              router.pathname === "/top-places"
                 ? "bg-neutral-700"
                 : "bg-transparent"
             }`}

@@ -1,7 +1,7 @@
-import type { UniquePlace } from "@prisma/client";
+import type { Place } from "@prisma/client";
 import { AnimatePresence, motion } from "framer-motion";
 import Head from "next/head";
-import type { NextPageWithLayout } from "../_app";
+import type { NextPageWithLayout } from "./_app";
 
 // external imports
 import LikeButton from "@/components/LikeButton";
@@ -13,7 +13,7 @@ import { FaMap, FaWikipediaW } from "react-icons/fa";
 
 const TopPlaces: NextPageWithLayout = () => {
   // unique places query
-  const uniquePlacesQuery = api.places.getPaginatedUnique.useInfiniteQuery(
+  const placesQuery = api.places.getPaginated.useInfiniteQuery(
     {
       limit: 10,
     },
@@ -40,12 +40,12 @@ const TopPlaces: NextPageWithLayout = () => {
     visible: { opacity: 1, y: 0 },
   };
 
-  if (uniquePlacesQuery.isLoading) {
+  if (placesQuery.isLoading) {
     return <LoadingScreen />;
   }
 
-  if (uniquePlacesQuery.isError) {
-    return <ErrorScreen error={uniquePlacesQuery.error} />;
+  if (placesQuery.isError) {
+    return <ErrorScreen error={placesQuery.error} />;
   }
 
   return (
@@ -66,8 +66,8 @@ const TopPlaces: NextPageWithLayout = () => {
           animate="visible"
         >
           <AnimatePresence mode="sync">
-            {uniquePlacesQuery.data.pages.map((page) =>
-              page.uniquePlaces.map((place) => (
+            {placesQuery.data.pages.map((page) =>
+              page.places.map((place) => (
                 <PlaceCard place={place} key={place.id} />
               ))
             )}
@@ -76,18 +76,17 @@ const TopPlaces: NextPageWithLayout = () => {
             aria-label="load more places"
             className="rounded-md bg-neutral-700 px-4 py-2 font-semibold text-white shadow-md ring-1 ring-gray-400 transition enabled:hover:bg-neutral-800 enabled:active:bg-neutral-700 disabled:cursor-not-allowed"
             variants={item}
-            onClick={() => void uniquePlacesQuery.fetchNextPage()}
+            onClick={() => void placesQuery.fetchNextPage()}
             disabled={
-              !uniquePlacesQuery.hasNextPage ||
-              uniquePlacesQuery.isFetchingNextPage
+              !placesQuery.hasNextPage || placesQuery.isFetchingNextPage
             }
           >
-            {uniquePlacesQuery.isFetchingNextPage ? (
+            {placesQuery.isFetchingNextPage ? (
               <div className="flex items-center justify-center gap-2">
                 <div className="aspect-square w-4 animate-spin rounded-full border-2 border-solid border-gray-100 border-t-transparent" />
                 <span className="text-white">Loading...</span>
               </div>
-            ) : uniquePlacesQuery.hasNextPage ? (
+            ) : placesQuery.hasNextPage ? (
               "Load more places"
             ) : (
               "No more places"
@@ -103,7 +102,7 @@ export default TopPlaces;
 
 TopPlaces.getLayout = (page) => <Layout>{page}</Layout>;
 
-const PlaceCard = ({ place }: { place: UniquePlace }) => {
+const PlaceCard = ({ place }: { place: Place }) => {
   // framer motion
   const item = {
     hidden: { opacity: 0, y: 20 },

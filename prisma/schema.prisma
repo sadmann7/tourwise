@@ -7,28 +7,7 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Tour {
-    id         String     @id @default(cuid())
-    country    String
-    preference PREFERENCE @default(ADVENTURE)
-    season     SEASON     @default(WINTER)
-    createdAt  DateTime   @default(now())
-    updatedAt  DateTime   @updatedAt
-    places     Place[]
-}
-
 model Place {
-    id          String   @id @default(cuid())
-    name        String
-    description String
-    like        Int      @default(0)
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
-    tour        Tour?    @relation(fields: [tourId], references: [id], onDelete: Cascade)
-    tourId      String?
-}
-
-model UniquePlace {
     id          String     @id @default(cuid())
     name        String     @unique
     description String
@@ -38,6 +17,13 @@ model UniquePlace {
     like        Int        @default(0)
     createdAt   DateTime   @default(now())
     updatedAt   DateTime   @updatedAt
+}
+
+model PlaceCounter {
+    id        String   @id @default(cuid())
+    count     Int      @default(0)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 enum PREFERENCE {

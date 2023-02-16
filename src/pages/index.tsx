@@ -29,18 +29,27 @@ const schema = z.object({
 type Inputs = z.infer<typeof schema>;
 
 const Home: NextPageWithLayout = () => {
+  const apiUtils = api.useContext();
+  const [preference, setPreference] = useState<PREFERENCE>(
+    PREFERENCE.ADVENTURE
+  );
+  const [season, setSeason] = useState<SEASON>(SEASON.WINTER);
+  const [country, setCountry] = useState<string>("Bangladesh");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isDone, setIsDone] = useState<boolean>(false);
+  const [generatedPlaces, setGeneratedPlaces] = useState<string>("");
   const countries = rawCountries.map((country) => country.name);
   const generatedRef = useRef<HTMLDivElement>(null);
 
-  // total places query
-  const totalPlacesQuery = api.places.getTotal.useQuery(undefined, {
+  // place counter query
+  const placeCounterQuery = api.places.getCount.useQuery(undefined, {
     refetchOnWindowFocus: false,
   });
 
-  // genereate places mutation
-  const placesMutaion = api.openai.generatePlaces.useMutation({
+  // increase place counter mutation
+  const increasePlaceCounterMutation = api.places.increaseCount.useMutation({
     onSuccess: async () => {
-      await totalPlacesQuery.refetch();
+      await apiUtils.places.getCount.invalidate();
     },
     onError: (error) => {
       toast.error(error.message);
@@ -52,8 +61,50 @@ const Home: NextPageWithLayout = () => {
     resolver: zodResolver(schema),
   });
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    await placesMutaion.mutateAsync(data);
-    if (!placesMutaion.data) return;
+    const prompt = `Suggest 5 places to visit in ${data.country} during ${data.season} for someone who likes ${data.preference}. Make sure to include a very short description of each place within 20 words. You can use the following template: 1. Place name: Description of place. 
+    For example: 1. Eiffel Tower: A famous landmark in Paris, France. It is a 324-meter tall iron tower that was built in 1889. It is one of the most visited places in the world. Make sure to suggest Sundarbans instead of Sundarban.`;
+
+    setIsLoading(true);
+    setGeneratedPlaces("");
+    setPreference(data.preference);
+    setSeason(data.season);
+    setCountry(data.country);
+
+    const response = await fetch("/api/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        prompt,
+      }),
+    });
+    console.log("Edge function returned.");
+
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+
+    // This data is a ReadableStream
+    const responseData = response.body;
+    if (!responseData) return;
+
+    const reader = responseData.getReader();
+    const decoder = new TextDecoder();
+
+    while (!isDone) {
+      const { done, value } = await reader.read();
+      if (done) {
+        setIsDone(true);
+        increasePlaceCounterMutation.mutate(5);
+        break;
+      }
+      const decodedValue = decoder.decode(value);
+      setGeneratedPlaces((prev) => prev + decodedValue);
+    }
+
+    setIsDone(false);
+    setIsLoading(false);
   };
 
   // framer motion
@@ -70,9 +121,9 @@ const Home: NextPageWithLayout = () => {
 
   // scroll to generated cities
   useEffect(() => {
-    if (!generatedRef.current) return;
+    if (!generatedRef.current || generatedPlaces.length === 0) return;
     generatedRef.current.scrollIntoView({ behavior: "smooth" });
-  }, [placesMutaion.data]);
+  }, [generatedPlaces.length]);
 
   return (
     <>
@@ -91,7 +142,7 @@ const Home: NextPageWithLayout = () => {
             Total{" "}
             <CountUp
               className="text-indigo-400"
-              end={totalPlacesQuery.data ?? 0}
+              end={placeCounterQuery.data ?? 0}
             />{" "}
             destinations generated so far
           </span>
@@ -157,33 +208,56 @@ const Home: NextPageWithLayout = () => {
           <Button
             aria-label="generate your places"
             variant="primary"
-            isLoading={placesMutaion.isLoading}
-            disabled={placesMutaion.isLoading}
+            isLoading={isLoading}
+            disabled={isLoading}
           >
-            {placesMutaion.isLoading ? "Loading..." : "Generate your places"}
+            {isLoading ? "Loading..." : "Generate your places"}
           </Button>
         </form>
-        <div ref={generatedRef}>
-          {placesMutaion.isSuccess ? (
-            <AnimatePresence mode="wait">
-              <motion.div className="mx-auto mt-5 grid w-full max-w-2xl gap-8">
-                <h2 className="text-center text-3xl font-bold text-white sm:text-4xl">
-                  Your generated destinations
-                </h2>
-                <motion.div
-                  variants={container}
-                  initial="hidden"
-                  animate="visible"
-                  className="grid gap-4"
-                >
-                  {placesMutaion.data.map((place) => (
-                    <PlaceCard key={place.name} place={place} />
+
+        {generatedPlaces ? (
+          <AnimatePresence mode="wait">
+            <motion.div
+              ref={generatedRef}
+              className="mx-auto mt-5 grid w-full max-w-2xl gap-8"
+            >
+              <h2 className="text-center text-3xl font-bold text-white sm:text-4xl">
+                Your generated destinations
+              </h2>
+              <motion.div
+                variants={container}
+                initial="hidden"
+                animate="visible"
+                className="grid w-full gap-4"
+              >
+                {generatedPlaces
+                  .split(".")
+                  .filter((place) => place !== "")
+                  .map((place) => {
+                    const [name, description] = place.split(":");
+                    return {
+                      name: name?.trim(),
+                      description: description?.trim(),
+                    };
+                  })
+                  .filter(
+                    (place) =>
+                      place.name !== undefined &&
+                      place.description !== undefined
+                  )
+                  .map((place) => (
+                    <PlaceCard
+                      key={place.name}
+                      place={place}
+                      country={country}
+                      preference={preference}
+                      season={season}
+                    />
                   ))}
-                </motion.div>
               </motion.div>
-            </AnimatePresence>
-          ) : null}
-        </div>
+            </motion.div>
+          </AnimatePresence>
+        ) : null}
       </main>
     </>
   );
@@ -198,11 +272,15 @@ type PlaceCardProps = {
     name?: string;
     description?: string;
   };
+  country: string;
+  preference: PREFERENCE;
+  season: SEASON;
 };
 
-const PlaceCard = ({ place }: PlaceCardProps) => {
-  const [isLiked, setIsLiked] = useState(false);
+const PlaceCard = ({ place, country, preference, season }: PlaceCardProps) => {
   const apiUtils = api.useContext();
+  const [isLiked, setIsLiked] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   // framer motion
   const item = {
@@ -218,43 +296,68 @@ const PlaceCard = ({ place }: PlaceCardProps) => {
       } else {
         toast.success("Added to Top Places");
       }
-      await apiUtils.places.getPaginatedUnique.cancel();
-      apiUtils.places.getPaginatedUnique.setInfiniteData(
-        { limit: 10 },
-        (data) => {
-          if (!data) {
-            return {
-              pages: [],
-              pageParams: [],
-            };
-          }
+      await apiUtils.places.getPaginated.cancel();
+      apiUtils.places.getPaginated.setInfiniteData({ limit: 10 }, (data) => {
+        if (!data) {
           return {
-            ...data,
-            pages: data.pages.map((page) => {
-              return {
-                ...page,
-                uniquePlaces: page.uniquePlaces.map((place) => {
-                  return {
-                    ...place,
-                    isDeleted: true,
-                  };
-                }),
-              };
-            }),
+            pages: [],
+            pageParams: [],
           };
         }
-      );
+        return {
+          ...data,
+          pages: data.pages.map((page) => {
+            return {
+              ...page,
+              places: page.places.map((place) => {
+                return {
+                  ...place,
+                  isDeleted: true,
+                };
+              }),
+            };
+          }),
+        };
+      });
     },
     onError: (error) => {
       toast.error(error.message);
     },
   });
 
+  // scroll to generated places
+
+  useEffect(() => {
+    if (!cardRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            cardRef.current?.scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+            });
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: "0px",
+        threshold: 0.5,
+      }
+    );
+    observer.observe(cardRef.current);
+    return () => {
+      observer.disconnect();
+    };
+  }, [cardRef]);
+
   return (
     <motion.div
       key={place.name}
       variants={item}
       className="grid gap-4 rounded-md bg-neutral-800 p-4 shadow-md ring-1 ring-gray-400"
+      ref={cardRef}
     >
       <div className="grid gap-2">
         <div className="flex items-center justify-between gap-2">
@@ -267,10 +370,10 @@ const PlaceCard = ({ place }: PlaceCardProps) => {
               updateLikeMutation.mutate({
                 name: place.name,
                 like: isLiked ? -1 : 1,
-                country: "Bangladesh",
+                country: country,
                 description: place.description,
-                preference: "ADVENTURE",
-                season: "WINTER",
+                preference: preference,
+                season: season,
               });
             }}
           />
