@@ -5,13 +5,22 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 
 export const placesRouter = createTRPCRouter({
   get: publicProcedure.query(async ({ ctx }) => {
-    const places = await ctx.prisma.place.findMany();
+    const places = await ctx.prisma.place.findMany({
+      include: {
+        tour: true,
+      },
+    });
     return places;
   }),
 
   getTotal: publicProcedure.query(async ({ ctx }) => {
     const totalPlaces = (await ctx.prisma.place.findMany()).length;
     return totalPlaces;
+  }),
+
+  getUnique: publicProcedure.query(async ({ ctx }) => {
+    const uniquePlaces = await ctx.prisma.uniquePlace.findMany();
+    return uniquePlaces;
   }),
 
   updateLike: publicProcedure

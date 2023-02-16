@@ -1,10 +1,44 @@
+import { AnimatePresence, motion } from "framer-motion";
 import Head from "next/head";
 import type { NextPageWithLayout } from "../_app";
 
 // external imports
 import Layout from "@/layouts/Layout";
+import ErrorScreen from "@/screens/ErrorScreen";
+import LoadingScreen from "@/screens/LoadingScreen";
+import { api } from "@/utils/api";
 
 const Places: NextPageWithLayout = () => {
+  // places query
+  const placesQuery = api.places.get.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
+
+  // framer motion
+  const container = {
+    hidden: { opacity: 1 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.5,
+      },
+    },
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
+  if (placesQuery.isLoading) {
+    return <LoadingScreen />;
+  }
+
+  if (placesQuery.isError) {
+    return <ErrorScreen error={placesQuery.error} />;
+  }
+
   return (
     <>
       <Head>
@@ -13,7 +47,31 @@ const Places: NextPageWithLayout = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="container mx-auto mt-24 mb-14 min-h-screen max-w-5xl px-4">
-        <p className="text-base text-white">Places</p>
+        <h1 className="text-4xl font-bold text-white">Places</h1>
+        <motion.div
+          className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 md:grid-cols-3 lg:grid-cols-4"
+          variants={container}
+          initial="hidden"
+          animate="visible"
+        >
+          <AnimatePresence mode="sync">
+            {placesQuery.data?.map((place) => (
+              <motion.div
+                key={place.id}
+                className="rounded-lg bg-neutral-800 p-4 shadow-lg ring-1 ring-gray-400"
+                variants={item}
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+              >
+                <h2 className="text-xl font-semibold text-white">
+                  {place.name}
+                </h2>
+                <p className="text-gray-300">{place.tour?.country ?? ""}</p>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </motion.div>
       </main>
     </>
   );
