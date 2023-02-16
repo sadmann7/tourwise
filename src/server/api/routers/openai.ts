@@ -22,7 +22,8 @@ export const openaiRouter = createTRPCRouter({
         });
       }
 
-      const prompt = `I want to go to a place in ${input.country} that is ${input.preference} and ${input.season}.\n\nHere are some places I like:\n\n- [Place 1](https://www.google.com)\n- [Place 2](https://www.google.com)\n- [Place 3](https://www.google.com)\n- [Place 4](https://www.google.com)\n- [Place 5](https://www.google.com)\n\nI want to go to a place that is ${input.preference} and ${input.season}.`;
+      const prompt = `Suggest 5 places to visit in ${input.country} during ${input.season} for someone who likes ${input.preference}. Make sure to include a very short description of each place within 20 words. You can use the following template: 1. Place name: Description of place. 
+                      For example: 1. Eiffel Tower: A famous landmark in Paris, France. It is a 324-meter tall iron tower that was built in 1889. It is one of the most visited places in the world.`;
 
       if (!prompt) {
         throw new TRPCError({
@@ -36,7 +37,7 @@ export const openaiRouter = createTRPCRouter({
           model: "text-davinci-003",
           prompt: prompt,
           temperature: 0.7,
-          max_tokens: 200,
+          max_tokens: 250,
           top_p: 1,
           frequency_penalty: 0,
           presence_penalty: 0,
@@ -61,6 +62,20 @@ export const openaiRouter = createTRPCRouter({
           message: "An error occurred during your request.",
         });
       }
-      return completion.data.choices[0]?.text;
+
+      const places = completion.data.choices[0].text
+        .split(".")
+        .filter((place) => place !== "")
+        .map((place) => {
+          const [name, description] = place.split(":");
+          return {
+            name: name?.trim(),
+            description: description?.trim(),
+          };
+        })
+        .filter(
+          (place) => place.name !== undefined && place.description !== undefined
+        );
+      return places;
     }),
 });

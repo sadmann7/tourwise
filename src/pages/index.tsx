@@ -2,20 +2,36 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Preference, Season } from "@prisma/client";
 import { AnimatePresence, motion } from "framer-motion";
 import Head from "next/head";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import type { NextPageWithLayout } from "./_app";
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  fill="none"
+  viewBox="0 0 24 24"
+  strokeWidth={1.5}
+  stroke="currentColor"
+  className="h-6 w-6"
+>
+  <path
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
+  />
+</svg>;
 
 // external imports
 import AnimatedText from "@/components/AnimatedText";
+import Button from "@/components/Button";
 import CountUp from "@/components/CountUp";
 import SelectBox from "@/components/DropdownSelect";
 import SearchableSelect from "@/components/SearchableSelect";
 import rawCountries from "@/data/countries.json";
 import Layout from "@/layouts/Layout";
 import { api } from "@/utils/api";
-import Button from "@/components/Button";
+import { FaMap, FaWikipediaW } from "react-icons/fa";
+import { HeartIcon } from "@heroicons/react/20/solid";
 
 const schema = z.object({
   country: z.string({ required_error: "Please select a country" }),
@@ -27,7 +43,6 @@ type Inputs = z.infer<typeof schema>;
 
 const Home: NextPageWithLayout = () => {
   const countries = rawCountries.map((country) => country.name);
-  const [places, setPlaces] = useState<string[]>();
   const generatedRef = useRef<HTMLDivElement>(null);
 
   // genereate places mutation
@@ -44,8 +59,8 @@ const Home: NextPageWithLayout = () => {
   const { handleSubmit, control, formState } = useForm<Inputs>({
     resolver: zodResolver(schema),
   });
-  const onSubmit: SubmitHandler<Inputs> = (data) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    await placesMutaion.mutateAsync(data);
   };
 
   // framer motion
@@ -68,7 +83,7 @@ const Home: NextPageWithLayout = () => {
   useEffect(() => {
     if (!generatedRef.current) return;
     generatedRef.current.scrollIntoView({ behavior: "smooth" });
-  }, [places]);
+  }, [placesMutaion.data]);
 
   return (
     <>
@@ -157,30 +172,61 @@ const Home: NextPageWithLayout = () => {
             {placesMutaion.isLoading ? "Loading..." : "Generate your places"}
           </Button>
         </form>
-        {places ? (
+        {placesMutaion.data ? (
           <AnimatePresence mode="wait">
             <motion.div
               ref={generatedRef}
-              className="mx-auto grid w-full max-w-2xl gap-8"
+              className="mx-auto mt-10 grid w-full max-w-2xl gap-8"
             >
               <h2 className="text-center text-3xl font-bold text-white sm:text-4xl">
                 Your generated destinations
               </h2>
               <motion.div
-                className="grid w-full place-items-center gap-3"
                 variants={container}
                 initial="hidden"
                 animate="visible"
+                className="grid gap-4"
               >
-                {places.map((place) => (
+                {placesMutaion.data.map((place) => (
                   <motion.div
-                    key={place}
-                    className="w-full max-w-2xl rounded-md bg-neutral-800 p-4 shadow-md ring-1 ring-gray-500"
+                    key={place.name}
                     variants={item}
+                    className="grid gap-4 rounded-lg bg-gray-800 p-4"
                   >
-                    <h3 className="text-base font-semibold text-white">
-                      {place}
-                    </h3>
+                    <div className="grid gap-2">
+                      <h3 className="text-xl font-semibold text-white">
+                        {place.name}
+                      </h3>
+                      <span className="text-base text-gray-400">
+                        {place.description}
+                      </span>
+                    </div>
+                    <div className="grid gap-2">
+                      <a
+                        aria-label="view on google maps"
+                        href={`https://www.google.com/maps/search/?api=1&query=${
+                          place.name as string
+                        }`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center gap-2 text-base text-indigo-500"
+                      >
+                        <FaMap className="h-5 w-5" />
+                        <span>View on Google Maps</span>
+                      </a>
+                      <a
+                        aria-label="view on wikipedia"
+                        href={`https://en.wikipedia.org/wiki/${
+                          place.name as string
+                        }`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center gap-2 text-base text-indigo-500"
+                      >
+                        <FaWikipediaW className="h-5 w-5" />
+                        <span>View on Wikipedia</span>
+                      </a>
+                    </div>
                   </motion.div>
                 ))}
               </motion.div>

@@ -42,7 +42,7 @@ const SearchableSelect = <TInputs extends FieldValues>({
         >
           <div className="relative mt-1">
             <Combobox.Input
-              className="w-full rounded-md border-gray-400 bg-neutral-900 px-4 py-2.5 text-white placeholder:text-gray-300 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+              className="w-full rounded-md border-gray-400 bg-neutral-900 px-4 py-2.5 text-white placeholder:text-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
               placeholder="Search for a country"
               onChange={(event) => setQuery(event.target.value)}
             />
@@ -53,7 +53,7 @@ const SearchableSelect = <TInputs extends FieldValues>({
               leaveTo="opacity-0"
               afterLeave={() => setQuery("")}
             >
-              <Combobox.Options className="absolute z-10 mt-2 max-h-60 w-full overflow-auto rounded-md bg-neutral-800 py-1 text-base shadow-lg ring-1 ring-gray-400 focus:outline-none">
+              <Combobox.Options className="absolute z-10 mt-2 max-h-60 w-full overflow-auto rounded-md bg-neutral-800 py-1 text-sm shadow-lg ring-1 ring-gray-400 focus:outline-none">
                 {filteredOptions.length === 0 && query !== "" ? (
                   <div className="relative cursor-default select-none py-2 px-4 text-white">
                     Nothing found.
