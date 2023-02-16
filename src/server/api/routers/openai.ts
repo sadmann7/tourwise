@@ -77,24 +77,24 @@ export const openaiRouter = createTRPCRouter({
           (place) => place.name !== undefined && place.description !== undefined
         );
 
-      await ctx.prisma.tour.create({
-        data: {
-          country: input.country,
-          preference: input.preference,
-          season: input.season,
-          places: {
-            createMany: {
-              data: places.map((place) => {
-                return {
-                  name: place.name as string,
-                  description: place.description as string,
-                };
-              }),
-              skipDuplicates: true,
-            },
-          },
-        },
-      });
+      // await ctx.prisma.tour.create({
+      //   data: {
+      //     country: input.country,
+      //     preference: input.preference,
+      //     season: input.season,
+      //     places: {
+      //       createMany: {
+      //         data: places.map((place) => {
+      //           return {
+      //             name: place.name as string,
+      //             description: place.description as string,
+      //           };
+      //         }),
+      //         skipDuplicates: true,
+      //       },
+      //     },
+      //   },
+      // });
 
       return places;
     }),
