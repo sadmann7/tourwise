@@ -17,7 +17,7 @@ export const placesRouter = createTRPCRouter({
         where: {},
         cursor: input.cursor ? { id: input.cursor } : undefined,
         orderBy: {
-          createdAt: "desc",
+          like: "desc",
         },
       });
       let nextCursor: typeof input.cursor | undefined = undefined;

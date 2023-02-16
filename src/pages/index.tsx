@@ -290,7 +290,7 @@ const PlaceCard = ({ place, country, preference, season }: PlaceCardProps) => {
 
   // update like mutation for unique places
   const updateLikeMutation = api.places.updateLike.useMutation({
-    onSuccess: async () => {
+    onMutate: async () => {
       if (isLiked) {
         toast.error("Remove from Top Places");
       } else {
@@ -312,7 +312,7 @@ const PlaceCard = ({ place, country, preference, season }: PlaceCardProps) => {
               places: page.places.map((place) => {
                 return {
                   ...place,
-                  isDeleted: true,
+                  like: place.like + (isLiked ? -1 : 1),
                 };
               }),
             };
