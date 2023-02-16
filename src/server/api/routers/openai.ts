@@ -1,4 +1,4 @@
-import { configuration, openai } from "@/utils/openai";
+import { configuration } from "@/utils/openai";
 import { PREFERENCE, SEASON } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -32,7 +32,7 @@ export const openaiRouter = createTRPCRouter({
         });
       }
 
-      const completion = await openai.createCompletion({
+      const completion = await ctx.openai.createCompletion({
         model: "text-davinci-003",
         prompt: prompt,
         temperature: 0.7,
@@ -56,39 +56,40 @@ export const openaiRouter = createTRPCRouter({
         });
       }
 
-      const places = completion.data.choices[0].text
-        .split(".")
-        .filter((place) => place !== "")
-        .map((place) => {
-          const [name, description] = place.split(":");
-          return {
-            name: name?.trim(),
-            description: description?.trim(),
-          };
-        })
-        .filter(
-          (place) => place.name !== undefined && place.description !== undefined
-        );
+      // const places = completion.data.choices[0].text
+      //   .split(".")
+      //   .filter((place) => place !== "")
+      //   .map((place) => {
+      //     const [name, description] = place.split(":");
+      //     return {
+      //       name: name?.trim(),
+      //       description: description?.trim(),
+      //     };
+      //   })
+      //   .filter(
+      //     (place) => place.name !== undefined && place.description !== undefined
+      //   );
 
-      await ctx.prisma.tour.create({
-        data: {
-          country: input.country,
-          preference: input.preference,
-          season: input.season,
-          places: {
-            createMany: {
-              data: places.map((place) => {
-                return {
-                  name: place.name as string,
-                  description: place.description as string,
-                };
-              }),
-              skipDuplicates: true,
-            },
-          },
-        },
-      });
+      // await ctx.prisma.tour.create({
+      //   data: {
+      //     country: input.country,
+      //     preference: input.preference,
+      //     season: input.season,
+      //     places: {
+      //       createMany: {
+      //         data: places.map((place) => {
+      //           return {
+      //             name: place.name as string,
+      //             description: place.description as string,
+      //           };
+      //         }),
+      //         skipDuplicates: true,
+      //       },
+      //     },
+      //   },
+      // });
 
-      return places;
+      // return places;
+      return completion.data.choices[0].text;
     }),
 });
