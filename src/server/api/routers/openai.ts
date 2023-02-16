@@ -32,24 +32,17 @@ export const openaiRouter = createTRPCRouter({
         });
       }
 
-      const completion = await ctx.openai.createCompletion(
-        {
-          model: "text-davinci-003",
-          prompt: prompt,
-          temperature: 0.7,
-          max_tokens: 250,
-          top_p: 1,
-          frequency_penalty: 0,
-          presence_penalty: 0,
-          stream: false,
-          n: 1,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const completion = await ctx.openai.createCompletion({
+        model: "text-davinci-003",
+        prompt: prompt,
+        temperature: 0.7,
+        max_tokens: 250,
+        top_p: 1,
+        frequency_penalty: 0,
+        presence_penalty: 0,
+        stream: false,
+        n: 1,
+      });
       if (!completion.data.choices) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -77,24 +70,24 @@ export const openaiRouter = createTRPCRouter({
           (place) => place.name !== undefined && place.description !== undefined
         );
 
-      // await ctx.prisma.tour.create({
-      //   data: {
-      //     country: input.country,
-      //     preference: input.preference,
-      //     season: input.season,
-      //     places: {
-      //       createMany: {
-      //         data: places.map((place) => {
-      //           return {
-      //             name: place.name as string,
-      //             description: place.description as string,
-      //           };
-      //         }),
-      //         skipDuplicates: true,
-      //       },
-      //     },
-      //   },
-      // });
+      await ctx.prisma.tour.create({
+        data: {
+          country: input.country,
+          preference: input.preference,
+          season: input.season,
+          places: {
+            createMany: {
+              data: places.map((place) => {
+                return {
+                  name: place.name as string,
+                  description: place.description as string,
+                };
+              }),
+              skipDuplicates: true,
+            },
+          },
+        },
+      });
 
       return places;
     }),
