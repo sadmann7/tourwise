@@ -23,7 +23,7 @@ export const openaiRouter = createTRPCRouter({
       }
 
       const prompt = `Suggest 5 places to visit in ${input.country} during ${input.season} for someone who likes ${input.preference}. Make sure to include a very short description of each place within 20 words. You can use the following template: 1. Place name: Description of place. 
-                      For example: 1. Eiffel Tower: A famous landmark in Paris, France. It is a 324-meter tall iron tower that was built in 1889. It is one of the most visited places in the world.`;
+                      For example: 1. Eiffel Tower: A famous landmark in Paris, France. It is a 324-meter tall iron tower that was built in 1889. It is one of the most visited places in the world. Make sure to suggest Sundarbans instead of Sundarban.`;
 
       if (!prompt) {
         throw new TRPCError({
