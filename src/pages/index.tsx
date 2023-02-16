@@ -1,25 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Preference, Season } from "@prisma/client";
+import { PREFERENCE, SEASON } from "@prisma/client";
 import { AnimatePresence, motion } from "framer-motion";
 import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
+import { toast } from "react-toastify";
 import { z } from "zod";
 import type { NextPageWithLayout } from "./_app";
-<svg
-  xmlns="http://www.w3.org/2000/svg"
-  fill="none"
-  viewBox="0 0 24 24"
-  strokeWidth={1.5}
-  stroke="currentColor"
-  className="h-6 w-6"
->
-  <path
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
-  />
-</svg>;
 
 // external imports
 import AnimatedText from "@/components/AnimatedText";
@@ -35,8 +22,8 @@ import { FaMap, FaWikipediaW } from "react-icons/fa";
 
 const schema = z.object({
   country: z.string({ required_error: "Please select a country" }),
-  preference: z.nativeEnum(Preference),
-  season: z.nativeEnum(Season),
+  preference: z.nativeEnum(PREFERENCE),
+  season: z.nativeEnum(SEASON),
 });
 
 type Inputs = z.infer<typeof schema>;
@@ -45,13 +32,18 @@ const Home: NextPageWithLayout = () => {
   const countries = rawCountries.map((country) => country.name);
   const generatedRef = useRef<HTMLDivElement>(null);
 
+  // total places query
+  const totalPlacesQuery = api.places.getTotal.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
+
   // genereate places mutation
   const placesMutaion = api.openai.generatePlaces.useMutation({
-    onSuccess: (data) => {
-      console.log(data);
+    onSuccess: async () => {
+      await totalPlacesQuery.refetch();
     },
     onError: (error) => {
-      console.log(error);
+      toast.error(error.message);
     },
   });
 
@@ -61,6 +53,7 @@ const Home: NextPageWithLayout = () => {
   });
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     await placesMutaion.mutateAsync(data);
+    if (!placesMutaion.data) return;
   };
 
   // framer motion
@@ -95,8 +88,12 @@ const Home: NextPageWithLayout = () => {
             destination with AI
           </h1>
           <span className="text-center text-lg text-gray-400 sm:text-xl">
-            Total <CountUp className="text-indigo-500" end={69} /> destinations
-            generated so far
+            Total{" "}
+            <CountUp
+              className="text-indigo-400"
+              end={totalPlacesQuery.data ?? 0}
+            />{" "}
+            destinations generated so far
           </span>
           <AnimatedText
             className="mx-auto from-indigo-500 to-indigo-500 text-2xl font-semibold sm:text-3xl"
@@ -133,9 +130,8 @@ const Home: NextPageWithLayout = () => {
             <SelectBox
               name="preference"
               control={control}
-              options={Object.values(Preference)}
+              options={Object.values(PREFERENCE)}
             />
-
             {formState.errors.preference ? (
               <span className="text-base text-red-500">
                 {formState.errors.preference.message}
@@ -150,9 +146,8 @@ const Home: NextPageWithLayout = () => {
             <SelectBox
               name="season"
               control={control}
-              options={Object.values(Season)}
+              options={Object.values(SEASON)}
             />
-
             {formState.errors.season ? (
               <span className="text-base text-red-500">
                 {formState.errors.season.message}
@@ -168,7 +163,7 @@ const Home: NextPageWithLayout = () => {
             {placesMutaion.isLoading ? "Loading..." : "Generate your places"}
           </Button>
         </form>
-        {placesMutaion.data ? (
+        {placesMutaion.isSuccess ? (
           <AnimatePresence mode="wait">
             <motion.div
               ref={generatedRef}
@@ -209,10 +204,25 @@ type PlaceCardProps = {
 const PlaceCard = ({ place }: PlaceCardProps) => {
   const [isLiked, setIsLiked] = useState(false);
 
+  // framer motion
   const item = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
   };
+
+  // update like mutation for unique places
+  const updateLikeMutation = api.places.updateLike.useMutation({
+    onSuccess: () => {
+      if (isLiked) {
+        toast.error("Remove from Top Places");
+      } else {
+        toast.success("Added to Top Places");
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
 
   return (
     <motion.div
@@ -223,7 +233,21 @@ const PlaceCard = ({ place }: PlaceCardProps) => {
       <div className="grid gap-2">
         <div className="flex items-center justify-between gap-2">
           <h3 className="text-xl font-semibold text-white">{place.name}</h3>
-          <LikeButton isLiked={isLiked} onClick={() => setIsLiked(!isLiked)} />
+          <LikeButton
+            isLiked={isLiked}
+            onClick={() => {
+              setIsLiked(!isLiked);
+              if (!place.name || !place.description) return;
+              updateLikeMutation.mutate({
+                name: place.name,
+                like: isLiked ? -1 : 1,
+                country: "Bangladesh",
+                description: place.description,
+                preference: "ADVENTURE",
+                season: "WINTER",
+              });
+            }}
+          />
         </div>
         <span className="text-base text-gray-300">{place.description}</span>
       </div>

@@ -1,5 +1,5 @@
 import { configuration } from "@/utils/openai";
-import { Preference, Season } from "@prisma/client";
+import { PREFERENCE, SEASON } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
@@ -9,8 +9,8 @@ export const openaiRouter = createTRPCRouter({
     .input(
       z.object({
         country: z.string(),
-        preference: z.nativeEnum(Preference),
-        season: z.nativeEnum(Season),
+        preference: z.nativeEnum(PREFERENCE),
+        season: z.nativeEnum(SEASON),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -76,6 +76,26 @@ export const openaiRouter = createTRPCRouter({
         .filter(
           (place) => place.name !== undefined && place.description !== undefined
         );
+
+      await ctx.prisma.tour.create({
+        data: {
+          country: input.country,
+          preference: input.preference,
+          season: input.season,
+          places: {
+            createMany: {
+              data: places.map((place) => {
+                return {
+                  name: place.name as string,
+                  description: place.description as string,
+                };
+              }),
+              skipDuplicates: true,
+            },
+          },
+        },
+      });
+
       return places;
     }),
 });

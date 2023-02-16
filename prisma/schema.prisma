@@ -10,8 +10,8 @@ datasource db {
 model Tour {
     id         String     @id @default(cuid())
     country    String
-    preference Preference @default(Adventure)
-    season     Season     @default(Winter)
+    preference PREFERENCE @default(ADVENTURE)
+    season     SEASON     @default(WINTER)
     createdAt  DateTime   @default(now())
     updatedAt  DateTime   @updatedAt
     places     Place[]
@@ -21,24 +21,36 @@ model Place {
     id          String   @id @default(cuid())
     name        String
     description String
-    country     String
+    like        Int      @default(0)
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
     tour        Tour?    @relation(fields: [tourId], references: [id], onDelete: Cascade)
     tourId      String?
 }
 
-enum Preference {
-    Adventure
-    Culture
-    Food
-    Relaxation
-    Nature
+model UniquePlace {
+    id          String     @id @default(cuid())
+    name        String     @unique
+    description String
+    country     String
+    preference  PREFERENCE @default(ADVENTURE)
+    season      SEASON     @default(WINTER)
+    like        Int        @default(0)
+    createdAt   DateTime   @default(now())
+    updatedAt   DateTime   @updatedAt
 }
 
-enum Season {
-    Winter
-    Spring
-    Summer
-    Autumn
+enum PREFERENCE {
+    ADVENTURE
+    CULTURE
+    FOOD
+    RELAXATION
+    NATURE
+}
+
+enum SEASON {
+    WINTER
+    SPRING
+    SUMMER
+    AUTUMN
 }

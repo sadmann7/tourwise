@@ -1,4 +1,5 @@
 import { openaiRouter } from "./routers/openai";
+import { placesRouter } from "./routers/places";
 import { createTRPCRouter } from "./trpc";
 
 /**
@@ -8,6 +9,7 @@ import { createTRPCRouter } from "./trpc";
  */
 export const appRouter = createTRPCRouter({
   openai: openaiRouter,
+  places: placesRouter,
 });
 
 // export type definition of API
