@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Preference, Season } from "@prisma/client";
 import { AnimatePresence, motion } from "framer-motion";
 import Head from "next/head";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import type { NextPageWithLayout } from "./_app";
@@ -26,12 +26,12 @@ import AnimatedText from "@/components/AnimatedText";
 import Button from "@/components/Button";
 import CountUp from "@/components/CountUp";
 import SelectBox from "@/components/DropdownSelect";
+import LikeButton from "@/components/LikeButton";
 import SearchableSelect from "@/components/SearchableSelect";
 import rawCountries from "@/data/countries.json";
 import Layout from "@/layouts/Layout";
 import { api } from "@/utils/api";
 import { FaMap, FaWikipediaW } from "react-icons/fa";
-import { HeartIcon } from "@heroicons/react/20/solid";
 
 const schema = z.object({
   country: z.string({ required_error: "Please select a country" }),
@@ -73,10 +73,6 @@ const Home: NextPageWithLayout = () => {
         delayChildren: 0.5,
       },
     },
-  };
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
   };
 
   // scroll to generated cities
@@ -166,7 +162,7 @@ const Home: NextPageWithLayout = () => {
           <Button
             aria-label="generate your places"
             variant="primary"
-            loading={placesMutaion.isLoading}
+            isLoading={placesMutaion.isLoading}
             disabled={placesMutaion.isLoading}
           >
             {placesMutaion.isLoading ? "Loading..." : "Generate your places"}
@@ -176,7 +172,7 @@ const Home: NextPageWithLayout = () => {
           <AnimatePresence mode="wait">
             <motion.div
               ref={generatedRef}
-              className="mx-auto mt-10 grid w-full max-w-2xl gap-8"
+              className="mx-auto mt-5 grid w-full max-w-2xl gap-8"
             >
               <h2 className="text-center text-3xl font-bold text-white sm:text-4xl">
                 Your generated destinations
@@ -188,46 +184,7 @@ const Home: NextPageWithLayout = () => {
                 className="grid gap-4"
               >
                 {placesMutaion.data.map((place) => (
-                  <motion.div
-                    key={place.name}
-                    variants={item}
-                    className="grid gap-4 rounded-lg bg-gray-800 p-4"
-                  >
-                    <div className="grid gap-2">
-                      <h3 className="text-xl font-semibold text-white">
-                        {place.name}
-                      </h3>
-                      <span className="text-base text-gray-400">
-                        {place.description}
-                      </span>
-                    </div>
-                    <div className="grid gap-2">
-                      <a
-                        aria-label="view on google maps"
-                        href={`https://www.google.com/maps/search/?api=1&query=${
-                          place.name as string
-                        }`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex items-center gap-2 text-base text-indigo-500"
-                      >
-                        <FaMap className="h-5 w-5" />
-                        <span>View on Google Maps</span>
-                      </a>
-                      <a
-                        aria-label="view on wikipedia"
-                        href={`https://en.wikipedia.org/wiki/${
-                          place.name as string
-                        }`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex items-center gap-2 text-base text-indigo-500"
-                      >
-                        <FaWikipediaW className="h-5 w-5" />
-                        <span>View on Wikipedia</span>
-                      </a>
-                    </div>
-                  </motion.div>
+                  <PlaceCard key={place.name} place={place} />
                 ))}
               </motion.div>
             </motion.div>
@@ -241,3 +198,59 @@ const Home: NextPageWithLayout = () => {
 export default Home;
 
 Home.getLayout = (page) => <Layout>{page}</Layout>;
+
+type PlaceCardProps = {
+  place: {
+    name?: string;
+    description?: string;
+  };
+};
+
+const PlaceCard = ({ place }: PlaceCardProps) => {
+  const [isLiked, setIsLiked] = useState(false);
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
+  return (
+    <motion.div
+      key={place.name}
+      variants={item}
+      className="grid gap-4 rounded-lg bg-neutral-800 p-4 shadow-md ring-1 ring-gray-400"
+    >
+      <div className="grid gap-2">
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="text-xl font-semibold text-white">{place.name}</h3>
+          <LikeButton isLiked={isLiked} onClick={() => setIsLiked(!isLiked)} />
+        </div>
+        <span className="text-base text-gray-300">{place.description}</span>
+      </div>
+      <div className="grid gap-2">
+        <a
+          aria-label="view on google maps"
+          href={`https://www.google.com/maps/search/?api=1&query=${
+            place.name ?? ""
+          }`}
+          target="_blank"
+          rel="noreferrer"
+          className="flex items-center justify-center gap-2 rounded-lg bg-gray-100 p-2 transition-colors hover:bg-gray-300 active:bg-gray-100"
+        >
+          <FaMap className="aspect-square w-5" aria-hidden="true" />
+          <span className="text-sm font-medium">View on Google Maps</span>
+        </a>
+        <a
+          aria-label="view on wikipedia"
+          href={`https://en.wikipedia.org/wiki/${place.name ?? ""}`}
+          target="_blank"
+          rel="noreferrer"
+          className="flex items-center justify-center gap-2 rounded-lg bg-gray-100 p-2 transition-colors hover:bg-gray-300 active:bg-gray-100"
+        >
+          <FaWikipediaW className="aspect-square w-5" aria-hidden="true" />
+          <span className="text-sm font-medium">View on Wikipedia</span>
+        </a>
+      </div>
+    </motion.div>
+  );
+};
