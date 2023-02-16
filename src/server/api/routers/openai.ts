@@ -56,40 +56,39 @@ export const openaiRouter = createTRPCRouter({
         });
       }
 
-      // const places = completion.data.choices[0].text
-      //   .split(".")
-      //   .filter((place) => place !== "")
-      //   .map((place) => {
-      //     const [name, description] = place.split(":");
-      //     return {
-      //       name: name?.trim(),
-      //       description: description?.trim(),
-      //     };
-      //   })
-      //   .filter(
-      //     (place) => place.name !== undefined && place.description !== undefined
-      //   );
+      const places = completion.data.choices[0].text
+        .split(".")
+        .filter((place) => place !== "")
+        .map((place) => {
+          const [name, description] = place.split(":");
+          return {
+            name: name?.trim(),
+            description: description?.trim(),
+          };
+        })
+        .filter(
+          (place) => place.name !== undefined && place.description !== undefined
+        );
 
-      // await ctx.prisma.tour.create({
-      //   data: {
-      //     country: input.country,
-      //     preference: input.preference,
-      //     season: input.season,
-      //     places: {
-      //       createMany: {
-      //         data: places.map((place) => {
-      //           return {
-      //             name: place.name as string,
-      //             description: place.description as string,
-      //           };
-      //         }),
-      //         skipDuplicates: true,
-      //       },
-      //     },
-      //   },
-      // });
+      await ctx.prisma.tour.create({
+        data: {
+          country: input.country,
+          preference: input.preference,
+          season: input.season,
+          places: {
+            createMany: {
+              data: places.map((place) => {
+                return {
+                  name: place.name as string,
+                  description: place.description as string,
+                };
+              }),
+              skipDuplicates: true,
+            },
+          },
+        },
+      });
 
-      // return places;
-      return completion.data.choices[0].text;
+      return places;
     }),
 });

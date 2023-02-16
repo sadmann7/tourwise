@@ -164,7 +164,7 @@ const Home: NextPageWithLayout = () => {
           </Button>
         </form>
         <div ref={generatedRef}>
-          {/* {placesMutaion.isSuccess ? (
+          {placesMutaion.isSuccess ? (
             <AnimatePresence mode="wait">
               <motion.div className="mx-auto mt-5 grid w-full max-w-2xl gap-8">
                 <h2 className="text-center text-3xl font-bold text-white sm:text-4xl">
@@ -182,7 +182,7 @@ const Home: NextPageWithLayout = () => {
                 </motion.div>
               </motion.div>
             </AnimatePresence>
-          ) : null} */}
+          ) : null}
         </div>
       </main>
     </>
