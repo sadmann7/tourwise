@@ -163,28 +163,27 @@ const Home: NextPageWithLayout = () => {
             {placesMutaion.isLoading ? "Loading..." : "Generate your places"}
           </Button>
         </form>
-        {placesMutaion.isSuccess ? (
-          <AnimatePresence mode="wait">
-            <motion.div
-              ref={generatedRef}
-              className="mx-auto mt-5 grid w-full max-w-2xl gap-8"
-            >
-              <h2 className="text-center text-3xl font-bold text-white sm:text-4xl">
-                Your generated destinations
-              </h2>
-              <motion.div
-                variants={container}
-                initial="hidden"
-                animate="visible"
-                className="grid gap-4"
-              >
-                {placesMutaion.data.map((place) => (
-                  <PlaceCard key={place.name} place={place} />
-                ))}
+        <div ref={generatedRef}>
+          {placesMutaion.isSuccess ? (
+            <AnimatePresence mode="wait">
+              <motion.div className="mx-auto mt-5 grid w-full max-w-2xl gap-8">
+                <h2 className="text-center text-3xl font-bold text-white sm:text-4xl">
+                  Your generated destinations
+                </h2>
+                <motion.div
+                  variants={container}
+                  initial="hidden"
+                  animate="visible"
+                  className="grid gap-4"
+                >
+                  {placesMutaion.data.map((place) => (
+                    <PlaceCard key={place.name} place={place} />
+                  ))}
+                </motion.div>
               </motion.div>
-            </motion.div>
-          </AnimatePresence>
-        ) : null}
+            </AnimatePresence>
+          ) : null}
+        </div>
       </main>
     </>
   );
