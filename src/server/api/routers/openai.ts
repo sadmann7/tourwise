@@ -1,4 +1,4 @@
-import { configuration } from "@/utils/openai";
+import { configuration, openai } from "@/utils/openai";
 import { PREFERENCE, SEASON } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -32,7 +32,7 @@ export const openaiRouter = createTRPCRouter({
         });
       }
 
-      const completion = await ctx.openai.createCompletion({
+      const completion = await openai.createCompletion({
         model: "text-davinci-003",
         prompt: prompt,
         temperature: 0.7,
