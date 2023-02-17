@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
 type CountUpProps = {
   end: number;
@@ -30,13 +31,15 @@ const CountUp = ({
   }, [end, duration]);
 
   return (
-    <span
+    <motion.span
       aria-label="count up from 0 to actual number"
       className={className}
       style={{ transitionDelay: `${delay}ms` }}
+      animate={{ opacity: 1 }}
+      initial={{ opacity: 0 }}
     >
       {count.toFixed(0)}
-    </span>
+    </motion.span>
   );
 };
 

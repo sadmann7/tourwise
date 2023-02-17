@@ -1,9 +1,12 @@
-import type { ButtonHTMLAttributes } from "react";
+import type { ButtonHTMLAttributes, DetailedHTMLProps } from "react";
 
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+type ButtonProps = {
   variant?: "primary" | "secondary";
   isLoading?: boolean;
-};
+} & DetailedHTMLProps<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  HTMLButtonElement
+>;
 
 const Button = ({
   variant = "primary",

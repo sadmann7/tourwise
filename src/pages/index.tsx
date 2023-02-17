@@ -1,25 +1,28 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PREFERENCE, SEASON } from "@prisma/client";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import Head from "next/head";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "react-toastify";
+import Balancer from "react-wrap-balancer";
 import { z } from "zod";
 import type { NextPageWithLayout } from "./_app";
 
 // external imports
-import AnimatedText from "@/components/AnimatedText";
 import Button from "@/components/Button";
 import CountUp from "@/components/CountUp";
 import SelectBox from "@/components/DropdownSelect";
 import LikeButton from "@/components/LikeButton";
+import ScrollingText from "@/components/ScrollingText";
 import SearchableSelect from "@/components/SearchableSelect";
 import rawCountries from "@/data/countries.json";
 import Layout from "@/layouts/Layout";
 import { api } from "@/utils/api";
+import { revealContainer, revealItem } from "@/utils/constants";
 import { FaWikipediaW } from "react-icons/fa";
 import { FiMap } from "react-icons/fi";
+import { FormattedPlace } from "@/types/globals";
 
 const schema = z.object({
   country: z.string({ required_error: "Please select a country" }),
@@ -39,6 +42,7 @@ const Home: NextPageWithLayout = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDone, setIsDone] = useState<boolean>(false);
   const [generatedPlaces, setGeneratedPlaces] = useState<string>("");
+  const [places, setPlaces] = useState<FormattedPlace[]>();
   const countries = rawCountries.map((country) => country.name);
   const generatedRef = useRef<HTMLDivElement>(null);
 
@@ -108,23 +112,31 @@ const Home: NextPageWithLayout = () => {
     setIsLoading(false);
   };
 
-  // framer motion
-  const container = {
-    hidden: { opacity: 1 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.5,
-      },
-    },
-  };
+  // format places and memoize it
+  useMemo(() => {
+    if (!generatedPlaces.length) return;
+    setPlaces(
+      generatedPlaces
+        .split(".")
+        .filter((place) => place !== "")
+        .map((place) => {
+          const [name, description] = place.split(":");
+          return {
+            name: name?.trim(),
+            description: description?.trim(),
+          };
+        })
+        .filter(
+          (place) => place.name !== undefined && place.description !== undefined
+        )
+    );
+  }, [generatedPlaces]);
 
   // scroll to generated cities
   useEffect(() => {
     if (!generatedRef.current || generatedPlaces.length === 0) return;
     generatedRef.current.scrollIntoView({ behavior: "smooth" });
-  }, [generatedPlaces.length]);
+  }, [generatedPlaces.length, isLoading]);
 
   return (
     <>
@@ -134,131 +146,133 @@ const Home: NextPageWithLayout = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="container mx-auto mt-28 mb-14 grid w-full max-w-4xl gap-10 px-4">
-        <div className="grid place-items-center gap-2 sm:gap-4">
-          <h1 className="text-center text-3xl font-semibold text-white sm:text-6xl">
-            Generate your next <span className="text-indigo-500">tour</span>{" "}
-            destination with AI
-          </h1>
-          <span className="text-center text-lg text-gray-400 sm:text-xl">
+        <motion.div
+          className="grid place-items-center gap-2 sm:gap-4"
+          initial="initial"
+          animate="animate"
+          variants={revealContainer}
+        >
+          <motion.h1
+            variants={revealItem}
+            className="text-center text-3xl font-semibold text-white sm:text-6xl"
+          >
+            <Balancer>
+              Generate your next <span className="text-indigo-500">tour</span>{" "}
+              destination with AI
+            </Balancer>
+          </motion.h1>
+          <motion.p
+            variants={revealItem}
+            className="text-center text-lg text-gray-400 sm:text-xl"
+          >
             Total{" "}
             <CountUp
               className="text-indigo-400"
               end={placeCounterQuery.data ?? 0}
             />{" "}
             destinations generated so far
-          </span>
-          <AnimatedText
-            className="mx-auto from-indigo-500 to-indigo-500 text-2xl font-semibold sm:text-3xl"
-            words={countries}
-            defaultWord="Bangladesh"
-          />
-        </div>
-        <form
-          aria-label="generate city from"
-          className="mx-auto grid w-full max-w-2xl gap-5"
-          onSubmit={(...args) => void handleSubmit(onSubmit)(...args)}
-        >
-          <fieldset className="grid gap-3">
-            <label htmlFor="country" className="text-base text-white">
-              <span className="rounded-full text-gray-400">1.</span> Select your
-              country
-            </label>
-            <SearchableSelect
-              name="country"
-              control={control}
-              options={countries}
+          </motion.p>
+          <motion.div variants={revealItem}>
+            <ScrollingText
+              className="text-xl font-semibold text-indigo-400 sm:text-3xl"
+              words={countries}
             />
-            {formState.errors.country ? (
-              <span className="text-base text-red-500">
-                {formState.errors.country.message}
-              </span>
-            ) : null}
-          </fieldset>
-          <fieldset className="grid gap-3">
-            <label htmlFor="preference" className="text-base text-white">
-              <span className="rounded-full text-gray-400">2.</span> Select your
-              tour preference
-            </label>
-            <SelectBox
-              name="preference"
-              control={control}
-              options={Object.values(PREFERENCE)}
-            />
-            {formState.errors.preference ? (
-              <span className="text-base text-red-500">
-                {formState.errors.preference.message}
-              </span>
-            ) : null}
-          </fieldset>
-          <fieldset className="grid gap-3">
-            <label htmlFor="season" className="text-base text-white">
-              <span className="rounded-full text-gray-400">3.</span> Select your
-              tour season
-            </label>
-            <SelectBox
-              name="season"
-              control={control}
-              options={Object.values(SEASON)}
-            />
-            {formState.errors.season ? (
-              <span className="text-base text-red-500">
-                {formState.errors.season.message}
-              </span>
-            ) : null}
-          </fieldset>
-          <Button
-            aria-label="generate your places"
-            variant="primary"
-            isLoading={isLoading}
-            disabled={isLoading}
+          </motion.div>
+          <form
+            aria-label="generate city from"
+            className="mx-auto grid w-full max-w-2xl gap-5"
+            onSubmit={(...args) => void handleSubmit(onSubmit)(...args)}
           >
-            {isLoading ? "Loading..." : "Generate your places"}
-          </Button>
-        </form>
-
-        {generatedPlaces ? (
-          <AnimatePresence mode="wait">
-            <motion.div
-              ref={generatedRef}
-              className="mx-auto mt-5 grid w-full max-w-2xl gap-8"
-            >
-              <h2 className="text-center text-3xl font-bold text-white sm:text-4xl">
-                Your generated destinations
-              </h2>
-              <motion.div
-                variants={container}
-                initial="hidden"
-                animate="visible"
-                className="grid w-full gap-4"
+            <motion.fieldset variants={revealItem} className="grid gap-3">
+              <label htmlFor="country" className="text-base text-white">
+                <span className="rounded-full text-gray-400">1.</span> Select
+                your country
+              </label>
+              <SearchableSelect
+                name="country"
+                control={control}
+                options={countries}
+              />
+              {formState.errors.country ? (
+                <span className="text-base text-red-500">
+                  {formState.errors.country.message}
+                </span>
+              ) : null}
+            </motion.fieldset>
+            <motion.fieldset variants={revealItem} className="grid gap-3">
+              <label htmlFor="preference" className="text-base text-white">
+                <span className="rounded-full text-gray-400">2.</span> Select
+                your tour preference
+              </label>
+              <SelectBox
+                name="preference"
+                control={control}
+                options={Object.values(PREFERENCE)}
+              />
+              {formState.errors.preference ? (
+                <span className="text-base text-red-500">
+                  {formState.errors.preference.message}
+                </span>
+              ) : null}
+            </motion.fieldset>
+            <motion.fieldset className="grid gap-3" variants={revealItem}>
+              <label htmlFor="season" className="text-base text-white">
+                <span className="rounded-full text-gray-400">3.</span> Select
+                your tour season
+              </label>
+              <SelectBox
+                name="season"
+                control={control}
+                options={Object.values(SEASON)}
+              />
+              {formState.errors.season ? (
+                <span className="text-base text-red-500">
+                  {formState.errors.season.message}
+                </span>
+              ) : null}
+            </motion.fieldset>
+            <motion.div variants={revealItem}>
+              <Button
+                aria-label="generate your places"
+                variant="primary"
+                isLoading={isLoading}
+                disabled={isLoading}
               >
-                {generatedPlaces
-                  .split(".")
-                  .filter((place) => place !== "")
-                  .map((place) => {
-                    const [name, description] = place.split(":");
-                    return {
-                      name: name?.trim(),
-                      description: description?.trim(),
-                    };
-                  })
-                  .filter(
-                    (place) =>
-                      place.name !== undefined &&
-                      place.description !== undefined
-                  )
-                  .map((place) => (
+                {isLoading ? "Loading..." : "Generate your places"}
+              </Button>
+            </motion.div>
+          </form>
+          {places && !isLoading ? (
+            <div
+              className="mx-auto mt-5 grid w-full max-w-2xl gap-8"
+              ref={generatedRef}
+            >
+              <motion.h2
+                className="text-center text-3xl font-bold text-white sm:text-4xl"
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
+              >
+                Your generated destinations
+              </motion.h2>
+              <div className="grid w-full gap-4">
+                {places.map((place) => (
+                  <motion.div
+                    key={place.name}
+                    variants={revealItem}
+                    className="flex flex-col gap-2"
+                  >
                     <PlaceCard
-                      key={place.name}
                       place={place}
                       country={country}
                       preference={preference}
                       season={season}
                     />
-                  ))}
-              </motion.div>
-            </motion.div>
-          </AnimatePresence>
-        ) : null}
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+        </motion.div>
       </main>
     </>
   );
@@ -281,13 +295,6 @@ type PlaceCardProps = {
 const PlaceCard = ({ place, country, preference, season }: PlaceCardProps) => {
   const apiUtils = api.useContext();
   const [isLiked, setIsLiked] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  // framer motion
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
 
   // update like mutation for unique places
   const updateLikeMutation = api.places.updateLike.useMutation({
@@ -326,38 +333,11 @@ const PlaceCard = ({ place, country, preference, season }: PlaceCardProps) => {
     },
   });
 
-  // scroll to generated places
-  useEffect(() => {
-    if (!cardRef.current) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            cardRef.current?.scrollIntoView({
-              behavior: "smooth",
-              block: "center",
-            });
-          }
-        });
-      },
-      {
-        root: null,
-        rootMargin: "0px",
-        threshold: 0.5,
-      }
-    );
-    observer.observe(cardRef.current);
-    return () => {
-      observer.disconnect();
-    };
-  }, [cardRef]);
-
   return (
     <motion.div
       key={place.name}
-      variants={item}
       className="grid gap-4 rounded-md bg-neutral-800 p-4 shadow-md ring-1 ring-gray-400"
-      ref={cardRef}
+      variants={revealItem}
     >
       <div className="grid gap-2">
         <div className="flex items-center justify-between gap-2">

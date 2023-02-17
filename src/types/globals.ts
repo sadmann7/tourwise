@@ -24,3 +24,8 @@ export interface NextApiRequestWithBody extends NextApiRequest {
     season: SEASON;
   };
 }
+
+export type FormattedPlace = {
+  name?: string;
+  description?: string;
+};
