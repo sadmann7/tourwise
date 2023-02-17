@@ -9,7 +9,8 @@ import Layout from "@/layouts/Layout";
 import ErrorScreen from "@/screens/ErrorScreen";
 import LoadingScreen from "@/screens/LoadingScreen";
 import { api } from "@/utils/api";
-import { MapIcon, WindIcon } from "lucide-react";
+import { FaWikipediaW } from "react-icons/fa";
+import { FiMap } from "react-icons/fi";
 
 const TopPlaces: NextPageWithLayout = () => {
   // unique places query
@@ -137,10 +138,7 @@ const PlaceCard = ({ place }: { place: Place }) => {
           rel="noreferrer"
           className="flex items-center justify-center gap-2 rounded-md bg-gray-100 p-2 transition-colors hover:bg-gray-300 active:bg-gray-100"
         >
-          <MapIcon
-            className="aspect-square w-5 text-white"
-            aria-hidden="true"
-          />
+          <FiMap className="text-white" size={18} />
           <span className="text-sm font-medium">Explore on Google Maps</span>
         </a>
         <a
@@ -150,10 +148,7 @@ const PlaceCard = ({ place }: { place: Place }) => {
           rel="noreferrer"
           className="flex items-center justify-center gap-2 rounded-md bg-gray-100 p-2 transition-colors hover:bg-gray-300 active:bg-gray-100"
         >
-          <WindIcon
-            className="aspect-square w-5 text-white"
-            aria-hidden="true"
-          />
+          <FaWikipediaW className="text-white" size={18} />
           <span className="text-sm font-medium">Explore on Wikipedia</span>
         </a>
       </div>

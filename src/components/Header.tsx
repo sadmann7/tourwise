@@ -3,29 +3,29 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { FiGithub, FiHeart, FiSend, FiTriangle } from "react-icons/fi";
 
+const navLinks = [
+  {
+    name: "Vercel",
+    icon: <FiTriangle size={20} />,
+    href: "https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app",
+    isExternal: true,
+  },
+
+  {
+    name: "Github",
+    icon: <FiGithub size={20} />,
+    href: "https://github.com/sadmann7/tourwise.git",
+    isExternal: true,
+  },
+  {
+    name: "Top Places",
+    icon: <FiHeart size={20} />,
+    href: "/top-places",
+    isExternal: false,
+  },
+];
+
 const Header = () => {
-  const navLinks = [
-    {
-      name: "Vercel",
-      icon: <FiTriangle size={20} />,
-      href: "https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app",
-      isExternal: true,
-    },
-
-    {
-      name: "Github",
-      icon: <FiGithub size={20} />,
-      href: "https://github.com/sadmann7/tourwise.git",
-      isExternal: true,
-    },
-    {
-      name: "Top Places",
-      icon: <FiHeart size={20} />,
-      href: "/top-places",
-      isExternal: false,
-    },
-  ];
-
   const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
 
