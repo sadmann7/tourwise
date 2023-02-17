@@ -27,7 +27,7 @@ const MyApp: AppType = ({ Component, pageProps }: AppPropsWithLayout) => {
   return (
     <>
       <Head>
-        <title>Next Tour</title>
+        <title>Tourwise</title>
       </Head>
       {getLayout(<Component {...pageProps} />)}
       <ToastWrapper />
