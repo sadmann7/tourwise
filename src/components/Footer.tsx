@@ -1,17 +1,25 @@
-// external imports
-
 const Footer = () => {
   return (
     <footer aria-label="footer">
-      <div className="grid place-items-center py-2">
+      <div className="grid place-items-center bg-zinc-600/60 py-4 text-gray-300 shadow-md backdrop-blur-md backdrop-filter">
         <h1>
-          Powred by
+          Powred by{" "}
+          <a
+            aria-label="navigate to vercel"
+            href="https://vercel.com"
+            target="_blank"
+            rel="noreferrer"
+            className="transition-colors hover:text-white active:text-gray-100"
+          >
+            Vercel
+          </a>
+          {" and "}
           <a
             aria-label="navigate to github repo"
             href="https://github.com/sadmann7"
             target="_blank"
             rel="noreferrer"
-            className="transition-opacity hover:text-opacity-80 active:text-opacity-90"
+            className="transition-colors hover:text-white active:text-gray-100"
           >
             OpenAI
           </a>

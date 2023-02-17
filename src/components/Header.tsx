@@ -6,20 +6,20 @@ import { useEffect, useState } from "react";
 const navLinks = [
   {
     name: "Vercel",
-    icon: <Triangle className="aspect-square w-6 text-white" />,
+    icon: <Triangle className="aspect-square w-6 text-gray-100" />,
     href: "https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app",
     isExternal: true,
   },
 
   {
     name: "Github",
-    icon: <GithubIcon className="aspect-square w-6 text-white" />,
+    icon: <GithubIcon className="aspect-square w-6 text-gray-100" />,
     href: "https://github.com/sadmann7/tourwise.git",
     isExternal: true,
   },
   {
     name: "Top Places",
-    icon: <HeartIcon className="aspect-square w-6 text-white" />,
+    icon: <HeartIcon className="aspect-square w-6 text-gray-100" />,
     href: "/top-places",
     isExternal: false,
   },
@@ -47,7 +47,7 @@ const Header = () => {
       aria-label="header"
       className={`fixed top-0 left-0 z-20 flex w-full items-center gap-4 ${
         isScrolled
-          ? "bg-gradient-to-r from-zinc-700 via-gray-600 to-gray-800 shadow-md backdrop-blur-sm backdrop-filter"
+          ? "bg-zinc-600/60 shadow-md backdrop-blur-md backdrop-filter transition-all duration-300 ease-in-out"
           : "bg-transparent"
       }`}
       onScroll={handleScroll}
@@ -56,12 +56,12 @@ const Header = () => {
         <Link
           aria-label="navigate to home page"
           href="/"
-          className="flex items-center gap-1.5 text-white transition-opacity hover:text-opacity-80 active:text-opacity-100"
+          className="flex items-center gap-1.5 text-gray-100 transition-colors hover:text-white active:text-gray-100"
         >
-          <SendIcon className="aspect-square w-4 text-white" />
+          <SendIcon className="aspect-square w-4" />
           <span className="hidden font-mono sm:block">Tourwise</span>
         </Link>
-        <div className="flex items-center gap-0.5">
+        <div className="flex items-center gap-1">
           {navLinks.map((link, index) =>
             link.isExternal ? (
               <a
@@ -70,7 +70,7 @@ const Header = () => {
                 href={link.href}
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-md bg-transparent p-1.5 font-mono text-base text-white transition-colors hover:bg-zinc-600 active:bg-zinc-700"
+                className="rounded-md bg-transparent p-1.5 font-mono text-base text-white transition-colors hover:bg-zinc-500 active:bg-zinc-400"
               >
                 {link.icon}
               </a>
@@ -79,9 +79,9 @@ const Header = () => {
                 aria-label={`navigate to ${link.name} page`}
                 key={index}
                 href={link.href}
-                className={`rounded-md bg-transparent p-1.5 font-mono text-base text-white transition-colors hover:bg-zinc-600 active:bg-zinc-700 ${
+                className={`rounded-md p-1.5 font-mono text-base text-white transition-colors hover:bg-zinc-500 active:bg-zinc-400 ${
                   router.pathname === link.href
-                    ? "bg-neutral-700"
+                    ? "bg-zinc-500"
                     : "bg-transparent"
                 }`}
               >
