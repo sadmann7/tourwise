@@ -18,6 +18,8 @@ import SearchableSelect from "@/components/SearchableSelect";
 import rawCountries from "@/data/countries.json";
 import Layout from "@/layouts/Layout";
 import { api } from "@/utils/api";
+import { FaWikipediaW } from "react-icons/fa";
+import { FiMap } from "react-icons/fi";
 
 const schema = z.object({
   country: z.string({ required_error: "Please select a country" }),
@@ -388,6 +390,7 @@ const PlaceCard = ({ place, country, preference, season }: PlaceCardProps) => {
           rel="noreferrer"
           className="flex items-center justify-center gap-2 rounded-md bg-gray-100 p-2 transition-colors hover:bg-gray-300 active:bg-gray-100"
         >
+          <FiMap className="text-black" size={18} />
           <span className="text-sm font-medium">Explore on Google Maps</span>
         </a>
         <a
@@ -397,6 +400,7 @@ const PlaceCard = ({ place, country, preference, season }: PlaceCardProps) => {
           rel="noreferrer"
           className="flex items-center justify-center gap-2 rounded-md bg-gray-100 p-2 transition-colors hover:bg-gray-300 active:bg-gray-100"
         >
+          <FaWikipediaW className="text-black" size={18} />
           <span className="text-sm font-medium">Explore on Wikipedia</span>
         </a>
       </div>

@@ -1,31 +1,31 @@
-import { GithubIcon, HeartIcon, SendIcon, Triangle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-
-const navLinks = [
-  {
-    name: "Vercel",
-    icon: <Triangle className="aspect-square w-6 text-gray-100" />,
-    href: "https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app",
-    isExternal: true,
-  },
-
-  {
-    name: "Github",
-    icon: <GithubIcon className="aspect-square w-6 text-gray-100" />,
-    href: "https://github.com/sadmann7/tourwise.git",
-    isExternal: true,
-  },
-  {
-    name: "Top Places",
-    icon: <HeartIcon className="aspect-square w-6 text-gray-100" />,
-    href: "/top-places",
-    isExternal: false,
-  },
-];
+import { FiGithub, FiHeart, FiSend, FiTriangle } from "react-icons/fi";
 
 const Header = () => {
+  const navLinks = [
+    {
+      name: "Vercel",
+      icon: <FiTriangle size={20} />,
+      href: "https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app",
+      isExternal: true,
+    },
+
+    {
+      name: "Github",
+      icon: <FiGithub size={20} />,
+      href: "https://github.com/sadmann7/tourwise.git",
+      isExternal: true,
+    },
+    {
+      name: "Top Places",
+      icon: <FiHeart size={20} />,
+      href: "/top-places",
+      isExternal: false,
+    },
+  ];
+
   const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -58,7 +58,7 @@ const Header = () => {
           href="/"
           className="flex items-center gap-1.5 text-gray-100 transition-colors hover:text-white active:text-gray-100"
         >
-          <SendIcon className="aspect-square w-4" />
+          <FiSend className="text-white" size={18} />
           <span className="hidden font-mono sm:block">Tourwise</span>
         </Link>
         <div className="flex items-center gap-1">
