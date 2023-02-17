@@ -34,7 +34,7 @@ const DropdownSelect = <TInputs extends FieldValues>({
           }}
         >
           <div className="relative">
-            <Listbox.Button className="relative w-full cursor-pointer rounded-md border border-gray-400 bg-neutral-900 py-2.5 pl-4 pr-10 text-left text-base text-white shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-1 focus-visible:ring-indigo-500">
+            <Listbox.Button className="relative w-full cursor-pointer rounded-md border border-gray-400 bg-neutral-700 py-2 pl-4 pr-10 text-left text-base text-white shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-1 focus-visible:ring-indigo-500">
               <span className="block truncate">
                 {titleCase(selected as string)}
               </span>
@@ -51,11 +51,11 @@ const DropdownSelect = <TInputs extends FieldValues>({
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
             >
-              <Listbox.Options className="absolute z-10 mt-2 max-h-60 w-full overflow-auto rounded-md bg-neutral-900 py-1 text-sm shadow-lg ring-1 ring-gray-400 focus:outline-none">
+              <Listbox.Options className="absolute z-10 mt-2 max-h-60 w-full overflow-auto rounded-md bg-neutral-700 py-1 text-sm shadow-lg ring-1 ring-gray-400 focus:outline-none">
                 {options.map((option) => (
                   <Listbox.Option
                     key={option}
-                    className="relative cursor-pointer select-none py-2 pl-10 pr-4 text-white transition hover:bg-neutral-700 ui-selected:bg-neutral-600 hover:ui-selected:bg-neutral-700"
+                    className="hover:ui-selected:bg-neutra-500 relative cursor-pointer select-none py-2 pl-10 pr-4 text-white transition hover:bg-neutral-500 ui-selected:bg-neutral-500/60"
                     value={option}
                   >
                     {({ selected }) => (

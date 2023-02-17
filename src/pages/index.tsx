@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PREFERENCE, SEASON } from "@prisma/client";
-import { motion } from "framer-motion";
+import { motion, useAnimation } from "framer-motion";
 import Head from "next/head";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
@@ -18,11 +18,12 @@ import ScrollingText from "@/components/ScrollingText";
 import SearchableSelect from "@/components/SearchableSelect";
 import rawCountries from "@/data/countries.json";
 import Layout from "@/layouts/Layout";
+import type { FormattedPlace } from "@/types/globals";
 import { api } from "@/utils/api";
 import { revealContainer, revealItem } from "@/utils/constants";
 import { FaWikipediaW } from "react-icons/fa";
 import { FiMap } from "react-icons/fi";
-import { FormattedPlace } from "@/types/globals";
+import { useInView } from "react-intersection-observer";
 
 const schema = z.object({
   country: z.string({ required_error: "Please select a country" }),
@@ -138,6 +139,18 @@ const Home: NextPageWithLayout = () => {
     generatedRef.current.scrollIntoView({ behavior: "smooth" });
   }, [generatedPlaces.length, isLoading]);
 
+  // framer-motion
+  const [ref, inView] = useInView();
+  const controls = useAnimation();
+
+  useEffect(() => {
+    if (inView) {
+      void controls.start("animate");
+    } else {
+      void controls.start("initial");
+    }
+  }, [controls, inView]);
+
   return (
     <>
       <Head>
@@ -162,8 +175,8 @@ const Home: NextPageWithLayout = () => {
             </Balancer>
           </motion.h1>
           <motion.p
-            variants={revealItem}
             className="text-center text-lg text-gray-400 sm:text-xl"
+            variants={revealItem}
           >
             Total{" "}
             <CountUp
@@ -247,29 +260,26 @@ const Home: NextPageWithLayout = () => {
               className="mx-auto mt-5 grid w-full max-w-2xl gap-8"
               ref={generatedRef}
             >
-              <motion.h2
-                className="text-center text-3xl font-bold text-white sm:text-4xl"
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
-              >
+              <h2 className="text-center text-3xl font-bold text-white sm:text-4xl">
                 Your generated destinations
-              </motion.h2>
-              <div className="grid w-full gap-4">
+              </h2>
+              <motion.div
+                className="grid w-full gap-4"
+                ref={ref}
+                animate={controls}
+                initial="hidden"
+                variants={revealContainer}
+              >
                 {places.map((place) => (
-                  <motion.div
+                  <PlaceCard
                     key={place.name}
-                    variants={revealItem}
-                    className="flex flex-col gap-2"
-                  >
-                    <PlaceCard
-                      place={place}
-                      country={country}
-                      preference={preference}
-                      season={season}
-                    />
-                  </motion.div>
+                    place={place}
+                    country={country}
+                    preference={preference}
+                    season={season}
+                  />
                 ))}
-              </div>
+              </motion.div>
             </div>
           ) : null}
         </motion.div>

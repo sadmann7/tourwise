@@ -23,18 +23,20 @@ export const revealContainer: Variants = {
     opacity: 1,
     transition: {
       staggerChildren: 0.2,
+      delayChildren: 0.5,
     },
   },
 };
 
 export const revealItem: Variants = {
-  initial: { opacity: 0, y: 20 },
+  initial: { opacity: 0, y: 50 },
   animate: {
     opacity: 1,
     y: 0,
     transition: {
       type: "spring",
       mass: 0.5,
+      damping: 8,
     },
   },
 };
@@ -59,6 +61,17 @@ export const itemFadeDown: Variants = {
 };
 
 export const itemFadeUp: Variants = {
+  hidden: { opacity: 0, y: 10 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+    },
+  },
+};
+
+export const itemSlideUp: Variants = {
   hidden: { opacity: 0, y: 10 },
   show: {
     opacity: 1,

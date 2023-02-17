@@ -10,10 +10,14 @@ import ErrorScreen from "@/screens/ErrorScreen";
 import LoadingScreen from "@/screens/LoadingScreen";
 import { api } from "@/utils/api";
 import { revealContainer, revealItem } from "@/utils/constants";
+import { useEffect } from "react";
 import { FaWikipediaW } from "react-icons/fa";
 import { FiMap } from "react-icons/fi";
+import { useInView } from "react-intersection-observer";
 
 const TopPlaces: NextPageWithLayout = () => {
+  const { ref, inView } = useInView();
+
   // places query
   const placesQuery = api.places.getPaginated.useInfiniteQuery(
     {
@@ -21,11 +25,18 @@ const TopPlaces: NextPageWithLayout = () => {
     },
     {
       getNextPageParam: (lastPage) => {
-        if (lastPage.nextCursor === null) return undefined;
+        if (!lastPage) return undefined;
         return lastPage.nextCursor;
       },
     }
   );
+
+  useEffect(() => {
+    if (!inView && placesQuery.hasNextPage) return;
+    if (inView) {
+      void placesQuery.fetchNextPage();
+    }
+  }, [inView, placesQuery]);
 
   if (placesQuery.isLoading) {
     return <LoadingScreen />;
@@ -58,6 +69,7 @@ const TopPlaces: NextPageWithLayout = () => {
             aria-label="load more places"
             className="rounded-md bg-neutral-700 px-4 py-2 font-semibold text-white shadow-md ring-1 ring-gray-400 transition enabled:hover:bg-neutral-800 enabled:active:bg-neutral-700 disabled:cursor-not-allowed"
             variants={revealItem}
+            ref={ref}
             onClick={() => void placesQuery.fetchNextPage()}
             disabled={
               !placesQuery.hasNextPage || placesQuery.isFetchingNextPage

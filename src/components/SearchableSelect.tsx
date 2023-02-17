@@ -1,5 +1,5 @@
 import { Combobox, Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import type { Control, FieldValues, Path } from "react-hook-form";
 import { Controller } from "react-hook-form";
 
@@ -16,13 +16,16 @@ const SearchableSelect = <TInputs extends FieldValues>({
 }: SearchableSelectProps<TInputs>) => {
   const [selected, setSelected] = useState<string | null>(null);
   const [query, setQuery] = useState<string>("");
+  const comboButtonRef = useRef<HTMLButtonElement>(null);
 
   const filteredOptions =
     query === ""
       ? options
-      : options.filter((option) =>
-          option.toLowerCase().includes(query.toLowerCase())
-        );
+      : options
+          .filter((option) =>
+            option.toLowerCase().includes(query.toLowerCase())
+          )
+          .slice(0, 5);
 
   return (
     <Controller
@@ -41,10 +44,17 @@ const SearchableSelect = <TInputs extends FieldValues>({
           }}
         >
           <div className="relative mt-1">
+            <Combobox.Button className="sr-only" ref={comboButtonRef}>
+              Combobox button
+            </Combobox.Button>
             <Combobox.Input
-              className="w-full rounded-md border-gray-400 bg-neutral-900 px-4 py-2.5 text-white placeholder:text-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-              placeholder="Search for a country"
+              className="w-full rounded-md border-gray-400 bg-neutral-700 px-4 py-2.5 text-white placeholder:text-gray-300 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+              placeholder="Search for a country..."
               onChange={(event) => setQuery(event.target.value)}
+              onFocus={() => {
+                if (!comboButtonRef.current) return;
+                comboButtonRef.current.click();
+              }}
             />
             <Transition
               as={Fragment}
@@ -53,7 +63,10 @@ const SearchableSelect = <TInputs extends FieldValues>({
               leaveTo="opacity-0"
               afterLeave={() => setQuery("")}
             >
-              <Combobox.Options className="absolute z-10 mt-2 max-h-60 w-full overflow-auto rounded-md bg-neutral-800 py-1 text-sm shadow-lg ring-1 ring-gray-400 focus:outline-none">
+              <Combobox.Options
+                static
+                className="absolute z-10 mt-2 max-h-64 w-full overflow-auto rounded-md bg-neutral-700 py-1 text-sm shadow-lg ring-1 ring-gray-400 focus:outline-none"
+              >
                 {filteredOptions.length === 0 && query !== "" ? (
                   <div className="relative cursor-default select-none py-2 px-4 text-white">
                     Nothing found.
@@ -62,7 +75,7 @@ const SearchableSelect = <TInputs extends FieldValues>({
                   filteredOptions.map((option) => (
                     <Combobox.Option
                       key={option}
-                      className="relative cursor-default select-none bg-neutral-900 py-2 px-4 text-white ui-active:bg-neutral-700"
+                      className="relative cursor-default select-none bg-neutral-700 py-2 px-4 text-white ui-active:bg-neutral-500"
                       value={option}
                     >
                       <span>{option}</span>
