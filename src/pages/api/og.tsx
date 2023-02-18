@@ -38,7 +38,7 @@ export default function handler(req: NextRequest) {
             <div tw="text-6xl font-bold whitespace-pre-wrap tracking-tight leading-tight text-white px-8">
               {title}
             </div>
-            <div tw="mt-5 text-4xl text-zinc-400 text-center font-normal whitespace-pre-wrap tracking-tight leading-tight px-8">
+            <div tw="mt-5 text-4xl text-zinc-300 text-center font-normal whitespace-pre-wrap tracking-tight leading-tight px-8">
               {description}
             </div>
           </div>
