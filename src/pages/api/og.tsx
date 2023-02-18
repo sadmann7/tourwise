@@ -15,54 +15,32 @@ export default function handler(req: NextRequest) {
       ? searchParams.get("title")?.slice(0, 100)
       : "My default title";
 
+    // ?description=<description>
+    const hasDescription = searchParams.has("description");
+    const description = hasDescription
+      ? searchParams.get("description")?.slice(0, 200)
+      : "My default description";
+
     return new ImageResponse(
       (
-        <div
-          style={{
-            backgroundColor: "black",
-            backgroundSize: "150px 150px",
-            height: "100%",
-            width: "100%",
-            display: "flex",
-            textAlign: "center",
-            alignItems: "center",
-            justifyContent: "center",
-            flexDirection: "column",
-            flexWrap: "nowrap",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              justifyItems: "center",
-            }}
-          >
+        <div tw="bg-black bg-cover h-full w-full flex items-center justify-center flex-col">
+          <div tw="flex items-center text-3xl justify-center flex-col">
             {
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                alt="Vercel"
-                height={200}
-                src="data:image/svg+xml,%3Csvg width='116' height='100' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M57.5 0L115 100H0L57.5 0z' /%3E%3C/svg%3E"
-                style={{ margin: "0 30px" }}
-                width={232}
+                src="https://tourwise.vercel.app/logo.png"
+                alt="Tourwise"
+                tw="w-60 h-60"
               />
             }
           </div>
-          <div
-            style={{
-              fontSize: 60,
-              fontStyle: "normal",
-              letterSpacing: "-0.025em",
-              color: "white",
-              marginTop: 30,
-              padding: "0 120px",
-              lineHeight: 1.4,
-              whiteSpace: "pre-wrap",
-            }}
-          >
-            {title}
+          <div tw="flex max-w-2xl items-center justify-center flex-col mt-8">
+            <div tw="text-6xl font-bold whitespace-pre-wrap tracking-tight leading-tight text-white px-8">
+              {title}
+            </div>
+            <div tw="mt-5 text-4xl text-zinc-400 text-center font-normal whitespace-pre-wrap tracking-tight leading-tight px-8">
+              {description}
+            </div>
           </div>
         </div>
       ),
