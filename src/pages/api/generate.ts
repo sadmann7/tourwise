@@ -2,6 +2,7 @@ import { env } from "@/env.mjs";
 import type { OpenAIStreamPayload } from "@/types/globals";
 import { openaiStream } from "@/utils/openai";
 import type { NextApiResponse } from "next";
+import type { NextRequest } from "next/server";
 
 if (!env.OPENAI_API_KEY) {
   throw new Error(
@@ -13,7 +14,7 @@ export const config = {
   runtime: "edge",
 };
 
-const handler = async (req: Request, res: NextApiResponse) => {
+const handler = async (req: NextRequest, res: NextApiResponse) => {
   const prompt = ((await req.json()) as { prompt: string }).prompt;
 
   if (!prompt) {
@@ -24,7 +25,7 @@ const handler = async (req: Request, res: NextApiResponse) => {
   const openaiPayload: OpenAIStreamPayload = {
     model: "text-davinci-003",
     prompt,
-    temperature: 0.69,
+    temperature: 0.7,
     max_tokens: 200,
     top_p: 1,
     frequency_penalty: 0,

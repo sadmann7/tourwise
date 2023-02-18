@@ -1,3 +1,4 @@
+import Meta from "@/components/Meta";
 import { type ReactNode } from "react";
 
 // external imports
@@ -6,11 +7,14 @@ import Header from "../components/Header";
 
 const Layout = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="flex min-h-screen flex-col">
-      <Header />
-      <div className="flex-1">{children}</div>
-      <Footer />
-    </div>
+    <>
+      <Meta />
+      <div className="flex min-h-screen flex-col">
+        <Header />
+        <div className="flex-1">{children}</div>
+        <Footer />
+      </div>
+    </>
   );
 };
 
