@@ -141,7 +141,9 @@ const Home: NextPageWithLayout = () => {
 
   // framer-motion
   const [ref, inView] = useInView({
-    threshold: 0.2,
+    threshold: 0.1,
+    triggerOnce: true,
+    rootMargin: "-100px",
   });
   const controls = useAnimation();
 
@@ -159,7 +161,7 @@ const Home: NextPageWithLayout = () => {
       <Head>
         <title>Tourwise</title>
       </Head>
-      <main className="container mx-auto mt-28 mb-14 grid w-full max-w-4xl gap-10 px-4">
+      <main className="container mx-auto mt-28 mb-14 w-full max-w-4xl px-4">
         <motion.div
           className="grid place-items-center gap-2 sm:gap-4"
           initial="hidden"
@@ -172,8 +174,8 @@ const Home: NextPageWithLayout = () => {
             className="text-center font-mono text-3xl font-semibold !leading-tight text-white sm:text-6xl"
             variants={itemFadeDown}
           >
-            <Balancer ratio={0.6}>
-              Decide where to <span className="text-indigo-500">tour</span> next
+            <Balancer ratio={0.5}>
+              Choose where to <span className="text-indigo-500">tour</span> next
               with AI
             </Balancer>
           </motion.h1>
@@ -260,7 +262,7 @@ const Home: NextPageWithLayout = () => {
           </motion.form>
           {places && !isLoading ? (
             <div
-              className="mx-auto mt-5 grid w-full max-w-2xl gap-8"
+              className="mx-auto mt-20 grid w-full max-w-2xl gap-8"
               ref={generatedRef}
             >
               <h2 className="text-center text-3xl font-bold text-white sm:text-4xl">
