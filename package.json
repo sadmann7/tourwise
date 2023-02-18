@@ -19,6 +19,7 @@
     "@trpc/next": "^10.9.0",
     "@trpc/react-query": "^10.9.0",
     "@trpc/server": "^10.9.0",
+    "@vercel/og": "^0.1.0",
     "eventsource-parser": "^0.1.0",
     "framer-motion": "^9.0.2",
     "next": "13.1.6",

@@ -8,8 +8,8 @@ type MetaProps = {
 
 const Meta = ({
   title = "Tourwise",
-  description = "Generate places to travel based on your preferences.",
-  image = "https://tourwise.vercel.app/api/og",
+  description = "Generate places to tour based on your preferences.",
+  image = "https://tourwise.vercel.app/api/og?title=Tourwise",
 }: MetaProps) => {
   return (
     <Head>

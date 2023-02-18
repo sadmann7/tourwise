@@ -55,6 +55,7 @@ const SearchableSelect = <TInputs extends FieldValues>({
                 if (!comboButtonRef.current) return;
                 comboButtonRef.current.click();
               }}
+              autoComplete="off"
             />
             <Transition
               as={Fragment}

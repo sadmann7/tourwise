@@ -15,9 +15,9 @@ This project generates social media bios using AI. It is bootstrapped with the [
 
 ## Features
 
-- Generate places using the OpenAI GPT-3 API based on the user's input
+- Generate places to travel based on user preferences
 - Save generated places to the database after clicking on the heart icon
-- Display saved places
+- Display saved places with the number of likes
 
 ## Installation
 

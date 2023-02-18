@@ -1,25 +1,18 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { FiGithub, FiHeart, FiSend, FiTriangle } from "react-icons/fi";
+import { FiGithub, FiHeart, FiSend } from "react-icons/fi";
 
 const navLinks = [
   {
-    name: "Vercel",
-    icon: <FiTriangle size={20} />,
-    href: "https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app",
-    isExternal: true,
-  },
-
-  {
     name: "Github",
-    icon: <FiGithub size={20} />,
+    icon: <FiGithub className="text-white" size={20} />,
     href: "https://github.com/sadmann7/tourwise.git",
     isExternal: true,
   },
   {
     name: "Top Places",
-    icon: <FiHeart size={20} />,
+    icon: <FiHeart className="text-white" size={20} />,
     href: "/top-places",
     isExternal: false,
   },
@@ -59,7 +52,7 @@ const Header = () => {
           className="flex items-center gap-1.5 text-gray-100 transition-colors hover:text-white active:text-gray-100"
         >
           <FiSend className="text-white" size={18} />
-          <span className="hidden font-mono sm:block">Tourwise</span>
+          <span className="font-mono">Tourwise</span>
         </Link>
         <div className="flex items-center gap-1">
           {navLinks.map((link, index) =>

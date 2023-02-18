@@ -171,11 +171,11 @@ const Home: NextPageWithLayout = () => {
           variants={revealContainer}
         >
           <motion.h1
-            className="text-center font-mono text-3xl font-semibold !leading-tight text-white sm:text-6xl"
+            className="text-center font-mono text-3xl font-bold text-white sm:text-6xl"
             variants={itemFadeDown}
           >
             <Balancer ratio={0.5}>
-              Choose where to <span className="text-indigo-500">tour</span> next
+              Choose where to <span className="text-indigo-400">tour</span> next
               with AI
             </Balancer>
           </motion.h1>
@@ -198,7 +198,7 @@ const Home: NextPageWithLayout = () => {
           </motion.div>
           <motion.form
             aria-label="generate city from"
-            className="mx-auto grid w-full max-w-2xl gap-5"
+            className="mx-auto mt-5 grid w-full max-w-2xl gap-5"
             onSubmit={(...args) => void handleSubmit(onSubmit)(...args)}
             variants={itemFadeDown}
           >
@@ -250,7 +250,6 @@ const Home: NextPageWithLayout = () => {
                 </span>
               ) : null}
             </fieldset>
-
             <Button
               aria-label="generate your places"
               variant="primary"

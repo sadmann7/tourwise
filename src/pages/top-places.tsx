@@ -51,7 +51,7 @@ const TopPlaces: NextPageWithLayout = () => {
       <Head>
         <title>Top rated places | Tourwise</title>
       </Head>
-      <main className="container mx-auto mt-24 mb-14 flex min-h-screen max-w-2xl flex-col gap-8 px-4">
+      <main className="container mx-auto mt-24 mb-14 flex max-w-2xl flex-col gap-8 px-4">
         <motion.div
           className="grid gap-4"
           initial="hidden"
